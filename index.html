@@ -1,0 +1,4567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Último Refúgio</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111;
+  font-family:Arial,sans-serif;
+  color:white;
+}
+
+button{
+  border:0;
+  outline:0;
+  font-family:Arial,sans-serif;
+}
+
+#game{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:#30352f;
+}
+
+#world{
+  position:absolute;
+  width:3000px;
+  height:2000px;
+  background:
+    linear-gradient(#ffffff08 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+  background-size:50px 50px;
+}
+
+/* MAPA */
+
+.road{
+  position:absolute;
+  background:#292d2b;
+  border:4px solid #555;
+}
+
+.road.h{
+  width:3000px;
+  height:150px;
+}
+
+.road.v{
+  width:150px;
+  height:2000px;
+}
+
+.place{
+  position:absolute;
+  width:260px;
+  height:180px;
+  border:5px solid #202321;
+  border-radius:12px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:15px;
+  text-align:center;
+  font-size:16px;
+  font-weight:bold;
+  text-shadow:0 2px 4px #000;
+  box-shadow:0 8px 20px #0008;
+  z-index:5;
+}
+
+.place.near{
+  border-color:#e3bd42;
+  box-shadow:
+    0 0 0 5px #e3bd42,
+    0 0 25px #e3bd4280,
+    0 8px 20px #000;
+}
+
+.house{background:#725a45}
+.house2{background:#62546e}
+.market{background:#63713d}
+.pharmacy{background:#477275}
+.police{background:#3d5875}
+.fire{background:#773b31}
+.garage{background:#67513a}
+.warehouse{background:#555d50}
+.hospital{background:#777d7a}
+.apartment{background:#665d55}
+.gas{background:#79602d}
+.shelter{background:#694737}
+.tower{background:#41484b}
+
+#house{left:180px;top:180px}
+#house2{left:850px;top:180px}
+#market{left:1540px;top:180px}
+#pharmacy{left:2230px;top:180px}
+
+#police{left:180px;top:700px}
+#hospital{left:850px;top:700px}
+#fire{left:1540px;top:700px}
+#garage{left:2230px;top:700px}
+
+#warehouse{left:350px;top:1280px}
+#apartment{left:1050px;top:1280px}
+#gas{left:1750px;top:1280px}
+#shelter{left:2230px;top:1280px}
+
+#tower{
+  left:1370px;
+  top:1640px;
+}
+
+/* PLAYER */
+
+#player{
+  position:absolute;
+  width:42px;
+  height:42px;
+  margin:-21px;
+  border-radius:50%;
+  background:#ddd;
+  border:4px solid #222;
+  z-index:100;
+  box-shadow:0 4px 10px #000;
+}
+
+#player:before{
+  content:"";
+  position:absolute;
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  background:#222;
+  left:10px;
+  top:5px;
+}
+
+#player:after{
+  content:"";
+  position:absolute;
+  width:24px;
+  height:11px;
+  background:#405d7d;
+  border-radius:8px;
+  left:5px;
+  bottom:4px;
+}
+
+#heldItem{
+  position:absolute;
+  left:27px;
+  top:17px;
+  width:28px;
+  height:28px;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+  transform:rotate(-15deg);
+  filter:drop-shadow(2px 2px 2px #000);
+  pointer-events:none;
+  z-index:130;
+}
+
+#heldItem.show{
+  display:flex;
+}
+
+/* FACADA */
+
+.knifeSlash{
+  position:absolute;
+  width:70px;
+  height:8px;
+  margin:-4px 0 0 0;
+  background:#eee;
+  border-radius:10px;
+  box-shadow:
+    0 0 5px white,
+    0 0 12px #ddd;
+  transform-origin:0 50%;
+  z-index:140;
+  pointer-events:none;
+  animation:slashAnim .16s linear forwards;
+}
+
+.knifeSlash:after{
+  content:"";
+  position:absolute;
+  left:-10px;
+  top:-3px;
+  width:18px;
+  height:14px;
+  background:#65432c;
+  border-radius:4px;
+}
+
+@keyframes slashAnim{
+  from{
+    opacity:1;
+    transform:scaleX(.45);
+  }
+  to{
+    opacity:0;
+    transform:scaleX(1.15);
+  }
+}
+
+/* INFECTADOS */
+
+.zombie{
+  position:absolute;
+  width:38px;
+  height:38px;
+  margin:-19px;
+  border-radius:50%;
+  background:#56684b;
+  border:4px solid #20281d;
+  z-index:50;
+  box-shadow:0 3px 8px #000;
+}
+
+.zombie:before,
+.zombie:after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:6px;
+  top:8px;
+  border-radius:50%;
+  background:#e63c3c;
+}
+
+.zombie:before{left:5px}
+.zombie:after{right:5px}
+
+.zombie.wave2{
+  background:#705f43;
+  border-color:#392b19;
+}
+
+.zombie.wave3{
+  background:#753e3e;
+  border-color:#321515;
+  box-shadow:0 0 12px #b52d2d;
+}
+
+/* RADIO */
+
+#radio{
+  position:absolute;
+  left:1405px;
+  top:1685px;
+  width:75px;
+  height:55px;
+  background:#222;
+  border:4px solid #555;
+  border-radius:8px;
+  z-index:20;
+}
+
+#radio:before{
+  content:"";
+  position:absolute;
+  left:12px;
+  top:13px;
+  width:30px;
+  height:20px;
+  background:#c5a832;
+}
+
+#radio:after{
+  content:"";
+  position:absolute;
+  width:4px;
+  height:30px;
+  background:#aaa;
+  right:8px;
+  top:-28px;
+  transform:rotate(15deg);
+}
+
+/* HUD */
+
+#hud{
+  position:fixed;
+  left:10px;
+  top:10px;
+  width:210px;
+  padding:10px;
+  background:#080808dd;
+  border-radius:12px;
+  border:1px solid #ffffff33;
+  z-index:500;
+}
+
+.stat{
+  margin-bottom:8px;
+}
+
+.statTitle{
+  font-size:11px;
+  margin-bottom:3px;
+}
+
+.bar{
+  width:100%;
+  height:11px;
+  border-radius:10px;
+  background:#222;
+  overflow:hidden;
+}
+
+.fill{
+  height:100%;
+  width:100%;
+}
+
+#hpFill{background:#d63f3f}
+#hungerFill{background:#d39a38}
+#thirstFill{background:#3d9be5}
+
+/* TIMER */
+
+#timerBox{
+  position:fixed;
+  top:10px;
+  right:10px;
+  width:115px;
+  padding:9px;
+  background:#080808dd;
+  border:1px solid #ffffff33;
+  border-radius:12px;
+  text-align:center;
+  z-index:600;
+}
+
+#timerLabel{
+  font-size:10px;
+  color:#aaa;
+}
+
+#timer{
+  font-size:28px;
+  font-weight:bold;
+}
+
+#wave{
+  font-size:11px;
+  margin-top:2px;
+  color:#e3bd42;
+  font-weight:bold;
+}
+
+/* PAUSA */
+
+#pauseButton{
+  position:fixed;
+  top:100px;
+  right:10px;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:#080808e8;
+  border:2px solid #ffffff44;
+  color:white;
+  font-size:20px;
+  z-index:900;
+  display:none;
+  touch-action:manipulation;
+}
+
+#pauseScreen{
+  display:none;
+  background:#101313ee;
+}
+
+/* OBJETIVO */
+
+#mission{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(520px,calc(100% - 390px));
+  padding:10px 15px;
+  background:#080808dd;
+  border-radius:12px;
+  border:1px solid #ffffff33;
+  text-align:center;
+  z-index:500;
+  font-size:13px;
+}
+
+#missionTitle{
+  color:#e3bd42;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+/* JOYSTICK MOVIMENTO */
+
+#joystickArea{
+  position:fixed;
+  width:145px;
+  height:145px;
+  left:20px;
+  bottom:20px;
+  border-radius:50%;
+  background:#ffffff12;
+  border:2px solid #ffffff33;
+  z-index:600;
+  touch-action:none;
+}
+
+#joystick{
+  position:absolute;
+  width:65px;
+  height:65px;
+  left:40px;
+  top:40px;
+  border-radius:50%;
+  background:#ddd8;
+  border:2px solid #fff7;
+}
+
+/* BOTÕES */
+
+#actions{
+  position:fixed;
+  right:18px;
+  bottom:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:700;
+}
+
+.action{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:#151515e8;
+  border:2px solid #ffffff44;
+  color:white;
+  font-size:11px;
+  font-weight:bold;
+  touch-action:none;
+}
+
+#attackButton{
+  background:#7c2929e8;
+}
+
+/* JOYSTICK DA ARMA */
+
+#weaponJoystickArea{
+  position:fixed;
+  right:105px;
+  bottom:20px;
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  background:#ffffff0c;
+  border:2px solid #ffffff22;
+  z-index:650;
+  display:none;
+  touch-action:none;
+}
+
+#weaponJoystick{
+  position:absolute;
+  width:48px;
+  height:48px;
+  left:26px;
+  top:26px;
+  border-radius:50%;
+  background:#c9c9c988;
+  border:2px solid #ffffff66;
+}
+
+/* RASTRO DA MIRA */
+
+#aimTrail{
+  position:absolute;
+  height:4px;
+  background:#ffd447;
+  box-shadow:
+    0 0 5px #ffd447,
+    0 0 12px #ffb000;
+  transform-origin:0 50%;
+  display:none;
+  z-index:125;
+  pointer-events:none;
+}
+
+#aimDot{
+  position:absolute;
+  width:12px;
+  height:12px;
+  margin:-6px;
+  border-radius:50%;
+  border:2px solid #ffd447;
+  background:#ffd44755;
+  display:none;
+  z-index:126;
+  pointer-events:none;
+}
+
+/* BOTÃO EXPLORAR */
+
+#interactButton{
+  position:fixed;
+  display:none;
+  left:50%;
+  bottom:110px;
+  transform:translateX(-50%);
+  padding:14px 28px;
+  border-radius:30px;
+  background:#dfb93d;
+  color:#111;
+  font-weight:bold;
+  font-size:15px;
+  z-index:700;
+}
+
+/* NOTIFICAÇÃO */
+
+#notification{
+  position:fixed;
+  top:90px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 18px;
+  max-width:90%;
+  background:#050505f5;
+  border:1px solid #777;
+  border-radius:10px;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:1200;
+}
+
+#notification.show{
+  opacity:1;
+}
+
+/* MOCHILA */
+
+#inventory{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:#000d;
+  z-index:1000;
+}
+
+.inventoryBox{
+  width:min(450px,100%);
+  max-height:85vh;
+  overflow:auto;
+  background:#202522;
+  border:2px solid #555;
+  border-radius:15px;
+  padding:18px;
+}
+
+.inventoryTitle{
+  text-align:center;
+  font-size:23px;
+  margin-bottom:18px;
+}
+
+.itemRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  margin-bottom:8px;
+  background:#303632;
+  border-radius:8px;
+}
+
+.itemRow button{
+  padding:7px 10px;
+  background:#4d7654;
+  color:white;
+  border-radius:7px;
+}
+
+.itemRow button:disabled{
+  opacity:.3;
+}
+
+.closeButton{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  background:#555;
+  color:white;
+  border-radius:8px;
+}
+
+/* TELAS */
+
+.screen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:25px;
+  background:#101313;
+  z-index:2000;
+}
+
+.screen h1{
+  font-size:clamp(40px,10vw,70px);
+  margin-bottom:20px;
+}
+
+.screen h2{
+  font-size:32px;
+  margin-bottom:20px;
+}
+
+.screen p{
+  max-width:650px;
+  color:#ccc;
+  line-height:1.5;
+  margin-bottom:15px;
+}
+
+.mainButton{
+  padding:15px 35px;
+  border-radius:10px;
+  background:#cbaa3d;
+  color:#111;
+  font-size:17px;
+  font-weight:bold;
+}
+
+#difficultyScreen{
+  display:none;
+}
+
+.difficultyButtons{
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.difficulty{
+  width:180px;
+  min-height:125px;
+  padding:15px;
+  border-radius:12px;
+  background:#252a27;
+  color:white;
+  border:2px solid #555;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.difficulty strong{
+  display:block;
+  font-size:21px;
+  margin-bottom:8px;
+}
+
+.difficulty small{
+  display:block;
+  color:#bbb;
+  line-height:1.4;
+}
+
+.difficulty:hover{
+  border-color:#e3bd42;
+}
+
+/* TELAS ESPECIAIS */
+
+#bossIntro,
+#endScreen,
+#deathScreen,
+#timeUpScreen{
+  display:none;
+  background:#140d0d;
+}
+
+#deathScreen{
+  background:
+    radial-gradient(circle at center,#451414 0%,#160909 45%,#080808 100%);
+}
+
+#timeUpScreen{
+  background:
+    radial-gradient(circle at center,#423512 0%,#17140a 45%,#080808 100%);
+}
+
+.dangerTitle{
+  color:#e94a4a;
+  text-shadow:0 0 18px #ff222288;
+}
+
+.timeTitle{
+  color:#e3bd42;
+  text-shadow:0 0 18px #e3bd4288;
+}
+
+/* BOSS */
+
+#boss{
+  position:absolute;
+  width:100px;
+  height:100px;
+  margin:-50px;
+  border-radius:45%;
+  background:#493e3e;
+  border:7px solid #211b1b;
+  box-shadow:0 0 30px #c22d2d99;
+  display:none;
+  z-index:80;
+}
+
+#boss:before,
+#boss:after{
+  content:"";
+  position:absolute;
+  width:16px;
+  height:16px;
+  top:22px;
+  border-radius:50%;
+  background:#ff3636;
+  box-shadow:0 0 10px red;
+}
+
+#boss:before{left:18px}
+#boss:after{right:18px}
+
+#bossUI{
+  position:fixed;
+  display:none;
+  top:90px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(520px,85%);
+  text-align:center;
+  z-index:800;
+}
+
+#bossName{
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+#bossBar{
+  width:100%;
+  height:18px;
+  background:#222;
+  border:2px solid white;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+#bossFill{
+  height:100%;
+  width:100%;
+  background:#a82c2c;
+}
+
+#bossWarning{
+  position:fixed;
+  display:none;
+  top:140px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:9px 15px;
+  background:#8e2020e8;
+  border-radius:9px;
+  font-weight:bold;
+  z-index:850;
+}
+
+#bossAttackArea{
+  position:absolute;
+  display:none;
+  border:4px solid #ed4141;
+  border-radius:50%;
+  background:#ed414122;
+  z-index:70;
+  pointer-events:none;
+}
+
+#weaponInfo{
+  position:fixed;
+  display:none;
+  right:220px;
+  bottom:35px;
+  background:#080808dd;
+  border:1px solid #ffffff33;
+  padding:8px 12px;
+  border-radius:9px;
+  font-size:12px;
+  z-index:500;
+}
+
+/* PROJÉTIL DO BOSS */
+
+.bossProjectile{
+  position:absolute;
+  width:18px;
+  height:18px;
+  margin:-9px;
+  border-radius:50%;
+  background:#ff3b3b;
+  border:3px solid #ffb0b0;
+  box-shadow:
+    0 0 8px red,
+    0 0 20px #ff2525;
+  z-index:130;
+  pointer-events:none;
+}
+
+/* TIRO DO PLAYER */
+
+.bullet{
+  position:absolute;
+  width:9px;
+  height:9px;
+  margin:-4px;
+  border-radius:50%;
+  background:#ffd447;
+  box-shadow:0 0 10px #ffb000;
+  z-index:120;
+}
+
+/* CORREÇÃO DOS ITENS */
+
+.resource.hidden{
+  display:none !important;
+}
+
+@media(max-width:600px){
+
+  #hud{
+    width:155px;
+    padding:7px;
+  }
+
+  #timerBox{
+    width:85px;
+  }
+
+  #timer{
+    font-size:22px;
+  }
+
+  #mission{
+    left:175px;
+    transform:none;
+    width:calc(100% - 270px);
+    min-width:110px;
+    font-size:11px;
+    padding:8px;
+  }
+
+  .difficulty{
+    width:145px;
+  }
+
+  .difficultyButtons{
+    gap:9px;
+  }
+
+  #joystickArea{
+    width:125px;
+    height:125px;
+  }
+
+  #joystick{
+    left:30px;
+    top:30px;
+  }
+
+  .action{
+    width:62px;
+    height:62px;
+  }
+
+  #weaponJoystickArea{
+    width:100px;
+    height:100px;
+    right:92px;
+  }
+
+  #weaponJoystick{
+    left:24px;
+    top:24px;
+  }
+
+  #weaponInfo{
+    right:85px;
+    bottom:130px;
+  }
+
+  #pauseButton{
+    top:92px;
+    right:10px;
+    width:44px;
+    height:44px;
+    font-size:18px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<div id="world">
+
+<div class="road h" style="top:500px"></div>
+<div class="road h" style="top:1080px"></div>
+
+<div class="road v" style="left:650px"></div>
+<div class="road v" style="left:1470px"></div>
+<div class="road v" style="left:2110px"></div>
+
+<div id="house" class="place house">
+CASA ABANDONADA
+</div>
+
+<div id="house2" class="place house2">
+CASA DO BAIRRO
+</div>
+
+<div id="market" class="place market">
+MERCADO CENTRAL
+</div>
+
+<div id="pharmacy" class="place pharmacy">
+FARMÁCIA
+</div>
+
+<div id="police" class="place police">
+DELEGACIA
+</div>
+
+<div id="hospital" class="place hospital">
+HOSPITAL MUNICIPAL
+</div>
+
+<div id="fire" class="place fire">
+CORPO DE BOMBEIROS
+</div>
+
+<div id="garage" class="place garage">
+OFICINA MECÂNICA
+</div>
+
+<div id="warehouse" class="place warehouse">
+GALPÃO INDUSTRIAL
+</div>
+
+<div id="apartment" class="place apartment">
+PRÉDIO RESIDENCIAL
+</div>
+
+<div id="gas" class="place gas">
+POSTO DE GASOLINA
+</div>
+
+<div id="shelter" class="place shelter">
+ABRIGO
+</div>
+
+<div id="tower" class="place tower">
+TORRE DE RÁDIO
+</div>
+
+<div id="radio"></div>
+
+<div id="boss"></div>
+
+<div id="bossAttackArea"></div>
+
+<div id="aimTrail"></div>
+<div id="aimDot"></div>
+
+<div id="player">
+  <div id="heldItem"></div>
+</div>
+
+</div>
+
+<div id="hud">
+
+<div class="stat">
+<div class="statTitle">VIDA</div>
+<div class="bar">
+<div id="hpFill" class="fill"></div>
+</div>
+</div>
+
+<div class="stat">
+<div class="statTitle">FOME</div>
+<div class="bar">
+<div id="hungerFill" class="fill"></div>
+</div>
+</div>
+
+<div class="stat">
+<div class="statTitle">SEDE</div>
+<div class="bar">
+<div id="thirstFill" class="fill"></div>
+</div>
+</div>
+
+</div>
+
+<div id="timerBox">
+
+<div id="timerLabel">
+TEMPO RESTANTE
+</div>
+
+<div id="timer">
+02:00
+</div>
+
+<div id="wave">
+ONDA 1 / 3
+</div>
+
+</div>
+
+<button id="pauseButton">
+⏸️
+</button>
+
+<div id="mission">
+
+<div id="missionTitle">
+OBJETIVO
+</div>
+
+<div id="missionText"></div>
+
+</div>
+
+<div id="bossUI">
+
+<div id="bossName">
+☠️ INFECTADO ALFA
+</div>
+
+<div id="bossBar">
+<div id="bossFill"></div>
+</div>
+
+</div>
+
+<div id="bossWarning"></div>
+
+<div id="weaponInfo"></div>
+
+<div id="joystickArea">
+<div id="joystick"></div>
+</div>
+
+<div id="actions">
+
+<button id="inventoryButton" class="action">
+🎒<br>MOCHILA
+</button>
+
+<button id="attackButton" class="action">
+🔪<br>FACADA
+</button>
+
+</div>
+
+<div id="weaponJoystickArea">
+<div id="weaponJoystick"></div>
+</div>
+
+<button id="interactButton">
+EXPLORAR
+</button>
+
+<div id="notification"></div>
+
+<!-- MOCHILA -->
+
+<div id="inventory">
+
+<div class="inventoryBox">
+
+<div class="inventoryTitle">
+🎒 MOCHILA
+</div>
+
+<div class="itemRow">
+<span>🥫 Comida</span>
+<span>
+<b id="foodCount">0</b>
+<button id="useFood">USAR</button>
+</span>
+</div>
+
+<div class="itemRow">
+<span>💧 Água</span>
+<span>
+<b id="waterCount">0</b>
+<button id="useWater">USAR</button>
+</span>
+</div>
+
+<div class="itemRow">
+<span>💊 Remédio</span>
+<span>
+<b id="medicineCount">0</b>
+<button id="useMedicine">USAR</button>
+</span>
+</div>
+
+<div class="itemRow">
+<span>🔫 Pistola</span>
+<b id="pistolCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>💥 Espingarda</span>
+<b id="shotgunCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔋 Munição</span>
+<b id="ammoCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔧 Pé de Cabra</span>
+<b id="crowbarCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🪪 Cartão</span>
+<b id="cardCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔑 Chave Bombeiros</span>
+<b id="fireKeyCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔑 Chave Oficina</span>
+<b id="garageKeyCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔐 Código</span>
+<b id="codeCount">0</b>
+</div>
+
+<div class="itemRow">
+<span>🔋 Bateria Rádio</span>
+<b id="batteryCount">0</b>
+</div>
+
+<button id="closeInventory" class="closeButton">
+FECHAR
+</button>
+
+</div>
+</div>
+
+<!-- TELA INICIAL -->
+
+<div id="startScreen" class="screen">
+
+<h1>
+ÚLTIMO REFÚGIO
+</h1>
+
+<p>
+A cidade caiu. Os infectados tomaram as ruas.
+</p>
+
+<p>
+Escolha a dificuldade para começar.
+</p>
+
+<button id="startButton" class="mainButton">
+ESCOLHER DIFICULDADE
+</button>
+
+</div>
+
+<!-- DIFICULDADES -->
+
+<div id="difficultyScreen" class="screen">
+
+<h2>
+ESCOLHA A DIFICULDADE
+</h2>
+
+<p>
+A dificuldade altera o tempo e a quantidade de ondas.
+</p>
+
+<div class="difficultyButtons">
+
+<button class="difficulty" data-diff="easy">
+
+<strong>
+🟢 FÁCIL
+</strong>
+
+<small>
+3 minutos<br>
+2 ondas<br>
+Sem onda 3
+</small>
+
+</button>
+
+<button class="difficulty" data-diff="medium">
+
+<strong>
+🟡 MÉDIO
+</strong>
+
+<small>
+3 minutos<br>
+3 ondas<br>
+Infectados mais fortes
+</small>
+
+</button>
+
+<button class="difficulty" data-diff="hard">
+
+<strong>
+🔴 DIFÍCIL
+</strong>
+
+<small>
+2 minutos<br>
+3 ondas<br>
+Boss com projéteis<br>
+Mais infectados
+</small>
+
+</button>
+
+</div>
+
+</div>
+
+<!-- BOSS -->
+
+<div id="bossIntro" class="screen">
+
+<h2>
+⚠️ INFECTADO ALFA
+</h2>
+
+<p>
+Uma criatura muito mais forte está protegendo a região da torre.
+</p>
+
+<p>
+Você encontrou armas no galpão.
+</p>
+
+<p>
+Na dificuldade Difícil, o Alfa também dispara projéteis.
+Desvie deles!
+</p>
+
+<button id="continueBossButton" class="mainButton">
+ENFRENTAR
+</button>
+
+</div>
+
+<!-- PAUSA -->
+
+<div id="pauseScreen" class="screen">
+
+<h2>
+⏸️ JOGO PAUSADO
+</h2>
+
+<p>
+O jogo está completamente pausado.
+</p>
+
+<button id="resumeButton" class="mainButton">
+▶️ CONTINUAR
+</button>
+
+<br><br>
+
+<button id="pauseRestartButton" class="mainButton">
+🔄 REINICIAR
+</button>
+
+</div>
+
+<!-- MORTE -->
+
+<div id="deathScreen" class="screen">
+
+<h2 class="dangerTitle">
+☠️ VOCÊ MORREU
+</h2>
+
+<p>
+Os infectados tomaram conta da região.
+</p>
+
+<p>
+Sua jornada terminou aqui.
+</p>
+
+<button id="deathRestartButton" class="mainButton">
+🔄 TENTAR NOVAMENTE
+</button>
+
+</div>
+
+<!-- TEMPO ESGOTADO -->
+
+<div id="timeUpScreen" class="screen">
+
+<h2 class="timeTitle">
+⏰ TEMPO ESGOTADO
+</h2>
+
+<p>
+Os infectados dominaram a região antes que você conseguisse transmitir o sinal.
+</p>
+
+<button id="timeRestartButton" class="mainButton">
+🔄 TENTAR NOVAMENTE
+</button>
+
+</div>
+
+<!-- FINAL -->
+
+<div id="endScreen" class="screen">
+
+<h2>
+📻 SINAL ENCONTRADO
+</h2>
+
+<p>
+Você derrotou o Infectado Alfa.
+</p>
+
+<p>
+A torre de rádio finalmente está funcionando.
+</p>
+
+<p>
+<strong>
+"Se alguém estiver ouvindo... ainda estamos vivos."
+</strong>
+</p>
+
+<p>
+<strong>
+FIM — PARTE 1
+</strong>
+</p>
+
+<button id="restartButton" class="mainButton">
+JOGAR NOVAMENTE
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+"use strict";
+
+/* ELEMENTOS */
+
+const player=document.getElementById("player");
+const world=document.getElementById("world");
+const heldItem=document.getElementById("heldItem");
+const interactButton=document.getElementById("interactButton");
+const missionText=document.getElementById("missionText");
+const notification=document.getElementById("notification");
+const inventory=document.getElementById("inventory");
+
+const boss=document.getElementById("boss");
+const bossUI=document.getElementById("bossUI");
+const bossFill=document.getElementById("bossFill");
+const bossWarning=document.getElementById("bossWarning");
+const bossAttackArea=document.getElementById("bossAttackArea");
+
+const timer=document.getElementById("timer");
+const waveElement=document.getElementById("wave");
+const weaponInfo=document.getElementById("weaponInfo");
+
+const hpFill=document.getElementById("hpFill");
+const hungerFill=document.getElementById("hungerFill");
+const thirstFill=document.getElementById("thirstFill");
+
+const startScreen=document.getElementById("startScreen");
+const difficultyScreen=document.getElementById("difficultyScreen");
+const bossIntro=document.getElementById("bossIntro");
+const pauseScreen=document.getElementById("pauseScreen");
+const deathScreen=document.getElementById("deathScreen");
+const timeUpScreen=document.getElementById("timeUpScreen");
+const endScreen=document.getElementById("endScreen");
+
+const startButton=document.getElementById("startButton");
+const continueBossButton=document.getElementById("continueBossButton");
+const restartButton=document.getElementById("restartButton");
+
+const pauseButton=document.getElementById("pauseButton");
+const resumeButton=document.getElementById("resumeButton");
+const pauseRestartButton=document.getElementById("pauseRestartButton");
+const deathRestartButton=document.getElementById("deathRestartButton");
+const timeRestartButton=document.getElementById("timeRestartButton");
+
+const inventoryButton=document.getElementById("inventoryButton");
+const closeInventory=document.getElementById("closeInventory");
+const attackButton=document.getElementById("attackButton");
+
+const foodCount=document.getElementById("foodCount");
+const waterCount=document.getElementById("waterCount");
+const medicineCount=document.getElementById("medicineCount");
+
+const pistolCount=document.getElementById("pistolCount");
+const shotgunCount=document.getElementById("shotgunCount");
+const ammoCount=document.getElementById("ammoCount");
+
+const crowbarCount=document.getElementById("crowbarCount");
+const cardCount=document.getElementById("cardCount");
+const fireKeyCount=document.getElementById("fireKeyCount");
+const garageKeyCount=document.getElementById("garageKeyCount");
+const codeCount=document.getElementById("codeCount");
+const batteryCount=document.getElementById("batteryCount");
+
+const useFood=document.getElementById("useFood");
+const useWater=document.getElementById("useWater");
+const useMedicine=document.getElementById("useMedicine");
+
+const joystickArea=document.getElementById("joystickArea");
+const joystick=document.getElementById("joystick");
+
+const weaponJoystickArea=document.getElementById("weaponJoystickArea");
+const weaponJoystick=document.getElementById("weaponJoystick");
+
+const aimTrail=document.getElementById("aimTrail");
+const aimDot=document.getElementById("aimDot");
+
+
+/* ESTADO */
+
+let gameStarted=false;
+let gameOverState=false;
+let paused=false;
+
+let objective=0;
+
+let playerX=520;
+let playerY=400;
+
+let hp=100;
+let hunger=100;
+let thirst=100;
+
+let food=2;
+let water=2;
+let medicine=0;
+
+let pistol=0;
+let shotgun=0;
+let ammo=0;
+
+let crowbar=false;
+let accessCard=false;
+let fireKey=false;
+let garageKey=false;
+let warehouseCode=false;
+let radioBattery=false;
+
+let bossActive=false;
+let bossDefeated=false;
+let bossHP=300;
+
+let bossX=1250;
+let bossY=1530;
+
+let bossAttackTimer=0;
+let bossAttackType="";
+
+let invincibleUntil=0;
+
+let nearbyPlace=null;
+
+let hungerTimer=0;
+let lastTime=0;
+let gameTime=0;
+
+let currentWave=1;
+let difficulty="hard";
+
+let TOTAL_TIME=120000;
+let MAX_WAVES=3;
+
+let waveSpeedMultiplier=1;
+let waveDamage=5;
+
+
+/* FACADA */
+
+let knifeCooldown=0;
+const KNIFE_COOLDOWN=420;
+const KNIFE_RANGE=90;
+
+
+/* JOYSTICK */
+
+let joystickX=0;
+let joystickY=0;
+let joystickActive=false;
+
+
+/* ARMA / MIRA */
+
+let weaponAimX=0;
+let weaponAimY=0;
+let weaponJoystickActive=false;
+let weaponAimMoved=false;
+
+const WEAPON_RANGE=450;
+
+
+/* PROJÉTEIS DO BOSS */
+
+let bossProjectiles=[];
+let bossProjectileTimer=0;
+let bossProjectileHits=0;
+
+
+/* OBJETIVOS */
+
+const missions=[
+
+"Vá até a Casa Abandonada e explore o local.",
+
+"Você encontrou o Pé de Cabra. Agora vá até a Farmácia.",
+
+"Você conseguiu o Cartão de Acesso. Agora vá até a Delegacia.",
+
+"Você encontrou a Chave dos Bombeiros. Agora vá até o Corpo de Bombeiros.",
+
+"Você conseguiu a Chave da Oficina. Agora vá até a Oficina Mecânica.",
+
+"Você encontrou o Código do Galpão. Agora vá até o Galpão Industrial.",
+
+"Você encontrou armas e munição. Vá até a Torre de Rádio e enfrente o Infectado Alfa.",
+
+"Derrote o Infectado Alfa. Depois vá até a Torre de Rádio e ative o rádio."
+
+];
+
+function updateMission(){
+  missionText.textContent=missions[Math.min(objective,missions.length-1)];
+}
+
+
+/* LOCAIS */
+
+const places={
+
+"Casa Abandonada":{
+  element:"house",
+  x:180,y:180,width:260,height:180
+},
+
+"Casa do Bairro":{
+  element:"house2",
+  x:850,y:180,width:260,height:180
+},
+
+"Mercado Central":{
+  element:"market",
+  x:1540,y:180,width:260,height:180
+},
+
+"Farmácia":{
+  element:"pharmacy",
+  x:2230,y:180,width:260,height:180
+},
+
+"Delegacia":{
+  element:"police",
+  x:180,y:700,width:260,height:180
+},
+
+"Hospital Municipal":{
+  element:"hospital",
+  x:850,y:700,width:260,height:180
+},
+
+"Corpo de Bombeiros":{
+  element:"fire",
+  x:1540,y:700,width:260,height:180
+},
+
+"Oficina Mecânica":{
+  element:"garage",
+  x:2230,y:700,width:260,height:180
+},
+
+"Galpão Industrial":{
+  element:"warehouse",
+  x:350,y:1280,width:260,height:180
+},
+
+"Prédio Residencial":{
+  element:"apartment",
+  x:1050,y:1280,width:260,height:180
+},
+
+"Posto de Gasolina":{
+  element:"gas",
+  x:1750,y:1280,width:260,height:180
+},
+
+"Abrigo":{
+  element:"shelter",
+  x:2230,y:1280,width:260,height:180
+}
+
+};
+
+
+/* NOTIFICAÇÃO */
+
+let notificationTimer;
+
+function showNotification(text){
+
+  notification.textContent=text;
+  notification.classList.add("show");
+
+  clearTimeout(notificationTimer);
+
+  notificationTimer=setTimeout(()=>{
+    notification.classList.remove("show");
+  },2600);
+
+}
+
+
+/* ITEM NA MÃO */
+
+function setHeldItem(item){
+
+  heldItem.textContent=item;
+
+  heldItem.classList.toggle(
+    "show",
+    !!item
+  );
+
+}
+
+
+/* PLAYER */
+
+function updatePlayer(){
+
+  player.style.left=playerX+"px";
+  player.style.top=playerY+"px";
+
+}
+
+
+function updateCamera(){
+
+  const sw=innerWidth;
+  const sh=innerHeight;
+
+  const cx=Math.max(
+    0,
+    Math.min(
+      3000-sw,
+      playerX-sw/2
+    )
+  );
+
+  const cy=Math.max(
+    0,
+    Math.min(
+      2000-sh,
+      playerY-sh/2
+    )
+  );
+
+  world.style.transform=
+    `translate(${-cx}px,${-cy}px)`;
+
+}
+
+
+/* JOYSTICK MOVIMENTO */
+
+function updateJoystick(x,y){
+
+  const r=joystickArea.getBoundingClientRect();
+
+  let dx=x-(r.left+r.width/2);
+  let dy=y-(r.top+r.height/2);
+
+  const rad=r.width/2-32;
+
+  const d=Math.hypot(dx,dy);
+
+  if(d>rad){
+    dx=dx/d*rad;
+    dy=dy/d*rad;
+  }
+
+  joystickX=dx/rad;
+  joystickY=dy/rad;
+
+  joystick.style.left=
+    (r.width/2-32+dx)+"px";
+
+  joystick.style.top=
+    (r.height/2-32+dy)+"px";
+
+}
+
+
+function resetJoystick(){
+
+  joystickX=0;
+  joystickY=0;
+
+  joystick.style.left=
+    innerWidth<=600 ? "30px":"40px";
+
+  joystick.style.top=
+    innerWidth<=600 ? "30px":"40px";
+
+}
+
+
+joystickArea.onpointerdown=e=>{
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+  joystickActive=true;
+
+  joystickArea.setPointerCapture(e.pointerId);
+
+  updateJoystick(
+    e.clientX,
+    e.clientY
+  );
+
+};
+
+
+joystickArea.onpointermove=e=>{
+
+  if(
+    joystickActive &&
+    !paused
+  ){
+
+    updateJoystick(
+      e.clientX,
+      e.clientY
+    );
+
+  }
+
+};
+
+
+joystickArea.onpointerup=
+joystickArea.onpointercancel=()=>{
+
+  joystickActive=false;
+
+  resetJoystick();
+
+};
+
+
+/* MOVIMENTO */
+
+function movePlayer(delta){
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+  const d=Math.hypot(
+    joystickX,
+    joystickY
+  );
+
+  if(d>.01){
+
+    const dx=joystickX/d;
+    const dy=joystickY/d;
+
+    const speed=.19*delta;
+
+    playerX+=dx*speed;
+    playerY+=dy*speed;
+
+  }
+
+  playerX=Math.max(
+    20,
+    Math.min(2980,playerX)
+  );
+
+  playerY=Math.max(
+    20,
+    Math.min(1980,playerY)
+  );
+
+  updatePlayer();
+
+}
+
+
+/* DISTÂNCIA */
+
+function distance(x1,y1,x2,y2){
+
+  return Math.hypot(
+    x2-x1,
+    y2-y1
+  );
+
+}
+
+
+function distanceToRect(px,py,r){
+
+  const x=Math.max(
+    r.x,
+    Math.min(px,r.x+r.width)
+  );
+
+  const y=Math.max(
+    r.y,
+    Math.min(py,r.y+r.height)
+  );
+
+  return distance(px,py,x,y);
+
+}
+
+
+/* LOCAIS BLOQUEADOS */
+
+function canExplore(name){
+
+  if(name==="Casa Abandonada")
+    return objective===0;
+
+  if(name==="Farmácia")
+    return objective===1 && crowbar;
+
+  if(name==="Delegacia")
+    return objective===2 && accessCard;
+
+  if(name==="Corpo de Bombeiros")
+    return objective===3 && fireKey;
+
+  if(name==="Oficina Mecânica")
+    return objective===4 && garageKey;
+
+  if(name==="Galpão Industrial")
+    return objective===5 && garageKey;
+
+  return [
+    "Casa do Bairro",
+    "Mercado Central",
+    "Hospital Municipal",
+    "Prédio Residencial",
+    "Posto de Gasolina",
+    "Abrigo"
+  ].includes(name);
+
+}
+
+
+/* DETECTAR LOCAL */
+
+function checkNearbyPlace(){
+
+  nearbyPlace=null;
+
+  document
+    .querySelectorAll(".place")
+    .forEach(e=>e.classList.remove("near"));
+
+  let closest=null;
+  let closestDistance=Infinity;
+
+  for(const name in places){
+
+    const p=places[name];
+
+    const d=distanceToRect(
+      playerX,
+      playerY,
+      p
+    );
+
+    if(d<105 && d<closestDistance){
+
+      closest=name;
+      closestDistance=d;
+
+    }
+
+  }
+
+  if(closest){
+
+    nearbyPlace=closest;
+
+    document
+      .getElementById(
+        places[closest].element
+      )
+      .classList.add("near");
+
+    interactButton.style.display="block";
+
+    interactButton.textContent=
+      canExplore(closest)
+      ?
+      "EXPLORAR"
+      :
+      "BLOQUEADO";
+
+    return;
+
+  }
+
+
+  const tower={
+    x:1370,
+    y:1640,
+    width:260,
+    height:180
+  };
+
+  if(
+    distanceToRect(
+      playerX,
+      playerY,
+      tower
+    )<120
+  ){
+
+    nearbyPlace="Torre de Rádio";
+
+    interactButton.style.display="block";
+
+    interactButton.textContent=
+      (
+        objective===7 &&
+        bossDefeated &&
+        radioBattery
+      )
+      ?
+      "ATIVAR RÁDIO"
+      :
+      "BLOQUEADO";
+
+    return;
+
+  }
+
+  interactButton.style.display="none";
+
+}
+
+
+/* EXPLORAR */
+
+function interact(){
+
+  if(
+    !nearbyPlace ||
+    paused ||
+    gameOverState
+  )return;
+
+
+  if(nearbyPlace==="Torre de Rádio"){
+
+    if(
+      objective===7 &&
+      bossDefeated &&
+      radioBattery
+    ){
+
+      finishGame();
+
+    }else{
+
+      showNotification(
+        "A torre ainda não pode ser ativada."
+      );
+
+    }
+
+    return;
+
+  }
+
+
+  if(
+    objective===0 &&
+    nearbyPlace==="Casa Abandonada"
+  ){
+
+    crowbar=true;
+    food++;
+    water++;
+
+    objective=1;
+
+    setHeldItem("🔧");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou um Pé de Cabra."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    objective===1 &&
+    nearbyPlace==="Farmácia"
+  ){
+
+    accessCard=true;
+    medicine+=2;
+
+    objective=2;
+
+    setHeldItem("🪪");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou o Cartão de Acesso."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    objective===2 &&
+    nearbyPlace==="Delegacia"
+  ){
+
+    fireKey=true;
+    food++;
+    water++;
+
+    objective=3;
+
+    setHeldItem("🔑");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou a Chave dos Bombeiros."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    objective===3 &&
+    nearbyPlace==="Corpo de Bombeiros"
+  ){
+
+    garageKey=true;
+    water+=2;
+
+    objective=4;
+
+    setHeldItem("🔑");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou a Chave da Oficina."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    objective===4 &&
+    nearbyPlace==="Oficina Mecânica"
+  ){
+
+    warehouseCode=true;
+
+    objective=5;
+
+    setHeldItem("🔐");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou o Código do Galpão."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    objective===5 &&
+    nearbyPlace==="Galpão Industrial"
+  ){
+
+    radioBattery=true;
+
+    pistol=1;
+    shotgun=1;
+    ammo=30;
+
+    objective=6;
+
+    setHeldItem("🔫");
+    updateMission();
+    updateInventory();
+
+    showNotification(
+      "Você encontrou armas e munição!"
+    );
+
+    return;
+
+  }
+
+
+  if(nearbyPlace==="Casa do Bairro"){
+
+    food++;
+    water++;
+
+  }
+
+  else if(nearbyPlace==="Mercado Central"){
+
+    food+=3;
+    water+=3;
+
+  }
+
+  else if(nearbyPlace==="Hospital Municipal"){
+
+    medicine+=3;
+    water+=2;
+
+  }
+
+  else if(nearbyPlace==="Prédio Residencial"){
+
+    food++;
+    water++;
+    medicine++;
+
+  }
+
+  else if(nearbyPlace==="Posto de Gasolina"){
+
+    food++;
+    water+=2;
+
+  }
+
+  else if(nearbyPlace==="Abrigo"){
+
+    hp=Math.min(100,hp+25);
+    hunger=Math.min(100,hunger+15);
+    thirst=Math.min(100,thirst+15);
+
+    updateBars();
+
+  }
+
+  updateInventory();
+
+  showNotification(
+    "Você encontrou alguns suprimentos."
+  );
+
+}
+
+interactButton.onclick=interact;
+
+
+/* ITENS DO MAPA */
+
+const resourceData=[
+
+["food",520,250],
+["water",1250,250],
+["food",2000,350],
+["medicine",700,850],
+["water",1350,900],
+["food",2050,900],
+["medicine",450,1500],
+["water",1300,1500]
+
+];
+
+
+resourceData.forEach(r=>{
+
+  const e=document.createElement("div");
+
+  e.className="resource";
+
+  e.style.position="absolute";
+  e.style.width="48px";
+  e.style.height="48px";
+  e.style.left=r[1]+"px";
+  e.style.top=r[2]+"px";
+  e.style.borderRadius="10px";
+  e.style.background="#161616";
+  e.style.border="3px solid #777";
+  e.style.display="flex";
+  e.style.alignItems="center";
+  e.style.justifyContent="center";
+  e.style.fontSize="25px";
+
+  e.dataset.type=r[0];
+
+  e.textContent=
+    r[0]==="food"
+    ?
+    "🥫"
+    :
+    r[0]==="water"
+    ?
+    "💧"
+    :
+    "💊";
+
+  world.appendChild(e);
+
+});
+
+
+function collectResources(){
+
+  if(paused)return;
+
+  document
+    .querySelectorAll(".resource:not(.hidden)")
+    .forEach(r=>{
+
+      const x=parseFloat(r.style.left);
+      const y=parseFloat(r.style.top);
+
+      if(
+        distance(
+          playerX,
+          playerY,
+          x,
+          y
+        )<65
+      ){
+
+        const type=r.dataset.type;
+
+        if(type==="food")food++;
+        if(type==="water")water++;
+        if(type==="medicine")medicine++;
+
+        r.classList.add("hidden");
+
+        updateInventory();
+
+        showNotification(
+          type==="food"
+          ?
+          "Você encontrou comida."
+          :
+          type==="water"
+          ?
+          "Você encontrou água."
+          :
+          "Você encontrou remédio."
+        );
+
+      }
+
+    });
+
+}
+
+
+/* ZUMBIS */
+
+let zombies=[];
+
+const starts=[
+
+[550,350],
+[800,350],
+[1200,350],
+[1500,350],
+[1950,400],
+[2500,400],
+
+[500,650],
+[800,650],
+[1200,650],
+[1500,650],
+[2000,650],
+[2500,650],
+
+[500,1050],
+[850,1050],
+[1200,1050],
+[1600,1050],
+[2050,1050],
+[2500,1050],
+
+[600,1500],
+[1000,1500],
+[1500,1500],
+[2000,1500],
+[2500,1500]
+
+];
+
+
+/* DIFÍCIL = +20% DE ZUMBIS */
+
+function createZombie(x,y){
+
+  const e=document.createElement("div");
+
+  e.className="zombie";
+
+  world.appendChild(e);
+
+  const z={
+    element:e,
+    x:x,
+    y:y,
+    baseSpeed:.018+Math.random()*.008,
+    attackCooldown:0
+  };
+
+  zombies.push(z);
+
+  updateZombieVisual(z);
+
+}
+
+
+function updateZombieVisual(z){
+
+  z.element.style.left=z.x+"px";
+  z.element.style.top=z.y+"px";
+
+  z.element.classList.toggle(
+    "wave2",
+    currentWave===2
+  );
+
+  z.element.classList.toggle(
+    "wave3",
+    currentWave===3
+  );
+
+}
+
+
+function createZombies(){
+
+  zombies.forEach(
+    z=>z.element.remove()
+  );
+
+  zombies=[];
+
+  let spawnList=[...starts];
+
+  if(difficulty==="hard"){
+
+    const extraCount=Math.ceil(
+      starts.length*.20
+    );
+
+    for(let i=0;i<extraCount;i++){
+
+      const original=
+        starts[
+          Math.floor(
+            Math.random()*starts.length
+          )
+        ];
+
+      spawnList.push([
+        Math.max(
+          30,
+          Math.min(
+            2970,
+            original[0]+(Math.random()*180-90)
+          )
+        ),
+        Math.max(
+          30,
+          Math.min(
+            1970,
+            original[1]+(Math.random()*180-90)
+          )
+        )
+      ]);
+
+    }
+
+  }
+
+  spawnList.forEach(
+    p=>createZombie(
+      p[0],
+      p[1]
+    )
+  );
+
+}
+
+
+function updateZombies(delta){
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+  zombies.forEach(z=>{
+
+    const d=distance(
+      z.x,
+      z.y,
+      playerX,
+      playerY
+    );
+
+    if(
+      d<500 &&
+      d>52
+    ){
+
+      const dx=(playerX-z.x)/d;
+      const dy=(playerY-z.y)/d;
+
+      z.x+=
+        dx*
+        z.baseSpeed*
+        waveSpeedMultiplier*
+        delta;
+
+      z.y+=
+        dy*
+        z.baseSpeed*
+        waveSpeedMultiplier*
+        delta;
+
+    }
+
+    if(d<=52){
+
+      z.attackCooldown-=delta;
+
+      if(z.attackCooldown<=0){
+
+        damagePlayer(waveDamage);
+
+        z.attackCooldown=
+          Math.max(
+            650,
+            1300/currentWave
+          );
+
+      }
+
+    }
+
+    updateZombieVisual(z);
+
+  });
+
+}
+
+
+/* ONDAS */
+
+function updateWave(){
+
+  const old=currentWave;
+
+  if(gameTime<40000)
+    currentWave=1;
+
+  else if(gameTime<80000)
+    currentWave=2;
+
+  else
+    currentWave=3;
+
+  if(currentWave>MAX_WAVES)
+    currentWave=MAX_WAVES;
+
+
+  if(currentWave===1){
+
+    waveSpeedMultiplier=1;
+    waveDamage=5;
+
+  }
+
+  else if(currentWave===2){
+
+    waveSpeedMultiplier=
+      difficulty==="easy"
+      ?
+      1.45
+      :
+      1.65;
+
+    waveDamage=
+      difficulty==="easy"
+      ?
+      8
+      :
+      10;
+
+  }
+
+  else{
+
+    waveSpeedMultiplier=3;
+    waveDamage=20;
+
+  }
+
+
+  if(old!==currentWave){
+
+    spawnWaveReinforcements();
+
+    showNotification(
+      "⚠️ ONDA "+
+      currentWave+
+      " INICIADA! Os infectados ficaram mais fortes!"
+    );
+
+  }
+
+
+  waveElement.textContent=
+    "ONDA "+
+    currentWave+
+    " / "+
+    MAX_WAVES;
+
+}
+
+
+function spawnWaveReinforcements(){
+
+  if(
+    currentWave===3 &&
+    MAX_WAVES<3
+  )return;
+
+  let amount=
+    currentWave===2
+    ?
+    7
+    :
+    12;
+
+  /* +20% DE REFORÇOS NO DIFÍCIL */
+
+  if(difficulty==="hard"){
+
+    amount=Math.ceil(
+      amount*1.20
+    );
+
+  }
+
+  for(let i=0;i<amount;i++){
+
+    const side=Math.floor(
+      Math.random()*4
+    );
+
+    let x;
+    let y;
+
+    if(side===0){
+
+      x=30;
+      y=50+Math.random()*1900;
+
+    }
+
+    else if(side===1){
+
+      x=2970;
+      y=50+Math.random()*1900;
+
+    }
+
+    else if(side===2){
+
+      x=50+Math.random()*2900;
+      y=30;
+
+    }
+
+    else{
+
+      x=50+Math.random()*2900;
+      y=1970;
+
+    }
+
+    createZombie(x,y);
+
+  }
+
+}
+
+
+/* FACADA AUTOMÁTICA */
+
+function showKnifeSlash(target){
+
+  const slash=
+    document.createElement("div");
+
+  slash.className="knifeSlash";
+
+  const dx=
+    target.x-playerX;
+
+  const dy=
+    target.y-playerY;
+
+  let angle=
+    Math.atan2(dy,dx)*180/Math.PI;
+
+  slash.style.left=
+    playerX+"px";
+
+  slash.style.top=
+    playerY+"px";
+
+  slash.style.transform=
+    `rotate(${angle}deg)`;
+
+  world.appendChild(slash);
+
+  setTimeout(()=>{
+    slash.remove();
+  },180);
+
+}
+
+
+function knifeAttack(){
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    bossActive ||
+    paused
+  )return;
+
+  if(knifeCooldown>0)
+    return;
+
+  knifeCooldown=
+    KNIFE_COOLDOWN;
+
+  let target=null;
+  let closest=Infinity;
+
+  zombies.forEach(z=>{
+
+    const d=
+      distance(
+        playerX,
+        playerY,
+        z.x,
+        z.y
+      );
+
+    if(
+      d<=KNIFE_RANGE &&
+      d<closest
+    ){
+
+      closest=d;
+      target=z;
+
+    }
+
+  });
+
+  if(target){
+
+    showKnifeSlash(target);
+
+    target.element.remove();
+
+    zombies=
+      zombies.filter(
+        z=>z!==target
+      );
+
+  }
+  else{
+
+    const fakeTarget={
+      x:playerX+50,
+      y:playerY
+    };
+
+    showKnifeSlash(fakeTarget);
+
+  }
+
+}
+
+
+let knifeHolding=false;
+let knifeInterval=null;
+
+function startKnife(){
+
+  if(
+    !gameStarted ||
+    bossActive ||
+    paused
+  )return;
+
+  knifeHolding=true;
+
+  knifeAttack();
+
+  clearInterval(knifeInterval);
+
+  knifeInterval=setInterval(
+    knifeAttack,
+    KNIFE_COOLDOWN
+  );
+
+}
+
+
+function stopKnife(){
+
+  knifeHolding=false;
+
+  clearInterval(knifeInterval);
+
+  knifeInterval=null;
+
+}
+
+
+attackButton.onpointerdown=e=>{
+
+  e.preventDefault();
+
+  startKnife();
+
+};
+
+attackButton.onpointerup=
+attackButton.onpointercancel=
+attackButton.onpointerleave=()=>{
+
+  stopKnife();
+
+};
+
+
+/* MIRA DA ARMA */
+
+function hideAim(){
+
+  aimTrail.style.display="none";
+  aimDot.style.display="none";
+
+}
+
+
+function updateWeaponAim(x,y){
+
+  if(paused)return;
+
+  const r=
+    weaponJoystickArea.getBoundingClientRect();
+
+  let dx=
+    x-(r.left+r.width/2);
+
+  let dy=
+    y-(r.top+r.height/2);
+
+  const rad=
+    r.width/2-24;
+
+  const d=
+    Math.hypot(dx,dy);
+
+  if(d>rad){
+
+    dx=dx/d*rad;
+    dy=dy/d*rad;
+
+  }
+
+  weaponAimX=dx/rad;
+  weaponAimY=dy/rad;
+
+  weaponJoystick.style.left=
+    (r.width/2-24+dx)+"px";
+
+  weaponJoystick.style.top=
+    (r.height/2-24+dy)+"px";
+
+  const normalized=
+    Math.hypot(
+      weaponAimX,
+      weaponAimY
+    );
+
+  if(normalized<.12){
+
+    weaponAimMoved=false;
+
+    hideAim();
+
+    return;
+
+  }
+
+  weaponAimMoved=true;
+
+  const dirX=
+    weaponAimX/normalized;
+
+  const dirY=
+    weaponAimY/normalized;
+
+  const length=WEAPON_RANGE;
+
+  aimTrail.style.display="block";
+
+  aimTrail.style.left=
+    playerX+"px";
+
+  aimTrail.style.top=
+    playerY+"px";
+
+  aimTrail.style.width=
+    length+"px";
+
+  aimTrail.style.transform=
+    `rotate(${Math.atan2(dirY,dirX)}rad)`;
+
+  aimDot.style.display="block";
+
+  aimDot.style.left=
+    (playerX+dirX*length)+"px";
+
+  aimDot.style.top=
+    (playerY+dirY*length)+"px";
+
+}
+
+
+function resetWeaponJoystick(){
+
+  weaponAimX=0;
+  weaponAimY=0;
+  weaponAimMoved=false;
+
+  weaponJoystick.style.left=
+    innerWidth<=600
+    ?
+    "24px"
+    :
+    "26px";
+
+  weaponJoystick.style.top=
+    innerWidth<=600
+    ?
+    "24px"
+    :
+    "26px";
+
+  hideAim();
+
+}
+
+
+/* DISPARO AO SOLTAR */
+
+function shootInAimDirection(){
+
+  if(
+    paused ||
+    !bossActive ||
+    !weaponAimMoved
+  ){
+
+    resetWeaponJoystick();
+
+    return;
+
+  }
+
+  if(ammo<=0){
+
+    showNotification(
+      "Você está sem munição!"
+    );
+
+    resetWeaponJoystick();
+
+    return;
+
+  }
+
+  const d=
+    Math.hypot(
+      weaponAimX,
+      weaponAimY
+    );
+
+  if(d<.12){
+
+    resetWeaponJoystick();
+
+    return;
+
+  }
+
+  const dx=weaponAimX/d;
+  const dy=weaponAimY/d;
+
+  ammo--;
+
+  updateInventory();
+
+  createBulletDirection(
+    playerX,
+    playerY,
+    dx,
+    dy
+  );
+
+  resetWeaponJoystick();
+
+}
+
+
+weaponJoystickArea.onpointerdown=e=>{
+
+  if(
+    !gameStarted ||
+    !bossActive ||
+    gameOverState ||
+    paused
+  )return;
+
+  e.preventDefault();
+
+  weaponJoystickActive=true;
+
+  weaponJoystickArea.setPointerCapture(
+    e.pointerId
+  );
+
+  updateWeaponAim(
+    e.clientX,
+    e.clientY
+  );
+
+};
+
+
+weaponJoystickArea.onpointermove=e=>{
+
+  if(
+    !weaponJoystickActive ||
+    paused
+  )return;
+
+  updateWeaponAim(
+    e.clientX,
+    e.clientY
+  );
+
+};
+
+
+weaponJoystickArea.onpointerup=e=>{
+
+  if(!weaponJoystickActive)
+    return;
+
+  weaponJoystickActive=false;
+
+  if(!paused)
+    shootInAimDirection();
+  else
+    resetWeaponJoystick();
+
+};
+
+
+weaponJoystickArea.onpointercancel=()=>{
+
+  weaponJoystickActive=false;
+
+  resetWeaponJoystick();
+
+};
+
+
+/* TIROS */
+
+function createBulletDirection(
+  sx,
+  sy,
+  ux,
+  uy
+){
+
+  const b=
+    document.createElement("div");
+
+  b.className="bullet";
+
+  world.appendChild(b);
+
+  let x=sx;
+  let y=sy;
+
+  let traveled=0;
+
+  const maxDistance=WEAPON_RANGE;
+
+  function animate(){
+
+    if(
+      !bossActive ||
+      gameOverState
+    ){
+
+      b.remove();
+
+      return;
+
+    }
+
+    if(paused){
+
+      requestAnimationFrame(animate);
+
+      return;
+
+    }
+
+    x+=ux*14;
+    y+=uy*14;
+
+    traveled+=14;
+
+    b.style.left=x+"px";
+    b.style.top=y+"px";
+
+    const hitDistance=
+      distance(
+        x,
+        y,
+        bossX,
+        bossY
+      );
+
+    if(hitDistance<55){
+
+      b.remove();
+
+      damageBoss(15);
+
+      return;
+
+    }
+
+    if(traveled>=maxDistance){
+
+      b.remove();
+
+      return;
+
+    }
+
+    requestAnimationFrame(
+      animate
+    );
+
+  }
+
+  animate();
+
+}
+
+
+/* NECESSIDADES */
+
+function updateBars(){
+
+  hpFill.style.width=
+    Math.max(0,hp)+"%";
+
+  hungerFill.style.width=
+    Math.max(0,hunger)+"%";
+
+  thirstFill.style.width=
+    Math.max(0,thirst)+"%";
+
+}
+
+
+function updateNeeds(delta){
+
+  if(paused)return;
+
+  hungerTimer+=delta;
+
+  if(hungerTimer<1000)
+    return;
+
+  const seconds=
+    hungerTimer/1000;
+
+  hungerTimer=0;
+
+  hunger=Math.max(
+    0,
+    hunger-.20*seconds
+  );
+
+  thirst=Math.max(
+    0,
+    thirst-.32*seconds
+  );
+
+  if(hunger<=0)
+    hp-=.2*seconds;
+
+  if(thirst<=0)
+    hp-=.3*seconds;
+
+  if(hp<=0){
+
+    hp=0;
+
+    die();
+
+  }
+
+  updateBars();
+
+}
+
+
+function damagePlayer(amount){
+
+  if(paused)return;
+
+  const now=performance.now();
+
+  if(now<invincibleUntil)
+    return;
+
+  invincibleUntil=
+    now+600;
+
+  hp=Math.max(
+    0,
+    hp-amount
+  );
+
+  updateBars();
+
+  if(hp<=0)
+    die();
+
+}
+
+
+/* MOCHILA */
+
+function updateInventory(){
+
+  foodCount.textContent=food;
+  waterCount.textContent=water;
+  medicineCount.textContent=medicine;
+
+  pistolCount.textContent=
+    pistol ? "✓":"0";
+
+  shotgunCount.textContent=
+    shotgun ? "✓":"0";
+
+  ammoCount.textContent=ammo;
+
+  crowbarCount.textContent=
+    crowbar ? "✓":"0";
+
+  cardCount.textContent=
+    accessCard ? "✓":"0";
+
+  fireKeyCount.textContent=
+    fireKey ? "✓":"0";
+
+  garageKeyCount.textContent=
+    garageKey ? "✓":"0";
+
+  codeCount.textContent=
+    warehouseCode ? "✓":"0";
+
+  batteryCount.textContent=
+    radioBattery ? "✓":"0";
+
+  useFood.disabled=food<=0;
+  useWater.disabled=water<=0;
+  useMedicine.disabled=medicine<=0;
+
+  weaponInfo.textContent=
+    "🔫 Munição: "+ammo;
+
+}
+
+
+useFood.onclick=()=>{
+
+  if(
+    paused ||
+    gameOverState
+  )return;
+
+  if(
+    food>0 &&
+    hunger<100
+  ){
+
+    food--;
+
+    hunger=Math.min(
+      100,
+      hunger+35
+    );
+
+    updateInventory();
+    updateBars();
+
+    showNotification(
+      "Você comeu."
+    );
+
+  }
+
+};
+
+
+useWater.onclick=()=>{
+
+  if(
+    paused ||
+    gameOverState
+  )return;
+
+  if(
+    water>0 &&
+    thirst<100
+  ){
+
+    water--;
+
+    thirst=Math.min(
+      100,
+      thirst+45
+    );
+
+    updateInventory();
+    updateBars();
+
+    showNotification(
+      "Você bebeu água."
+    );
+
+  }
+
+};
+
+
+useMedicine.onclick=()=>{
+
+  if(
+    paused ||
+    gameOverState
+  )return;
+
+  if(
+    medicine>0 &&
+    hp<100
+  ){
+
+    medicine--;
+
+    hp=Math.min(
+      100,
+      hp+35
+    );
+
+    updateInventory();
+    updateBars();
+
+    showNotification(
+      "Você usou um remédio."
+    );
+
+  }
+
+};
+
+
+inventoryButton.onclick=()=>{
+
+  if(
+    gameStarted &&
+    !gameOverState &&
+    !paused
+  )
+    inventory.style.display="flex";
+
+};
+
+
+closeInventory.onclick=()=>{
+
+  inventory.style.display="none";
+
+};
+
+
+/* BOSS */
+
+function startBoss(){
+
+  if(
+    bossActive ||
+    bossDefeated ||
+    paused
+  )return;
+
+  bossIntro.style.display="flex";
+
+}
+
+
+continueBossButton.onclick=()=>{
+
+  if(paused)return;
+
+  bossIntro.style.display="none";
+
+  bossActive=true;
+
+  bossHP=300;
+
+  bossX=1250;
+  bossY=1530;
+
+  boss.style.left=bossX+"px";
+  boss.style.top=bossY+"px";
+  boss.style.display="block";
+
+  bossUI.style.display="block";
+
+  weaponInfo.style.display="block";
+
+  weaponJoystickArea.style.display="block";
+
+  attackButton.style.display="none";
+
+  bossFill.style.width="100%";
+
+  bossAttackTimer=1400;
+
+  bossProjectileTimer=
+    difficulty==="hard"
+    ?
+    1800
+    :
+    999999;
+
+  bossProjectileHits=0;
+
+  showNotification(
+    difficulty==="hard"
+    ?
+    "Desvie dos projéteis! Mire e solte o joystick para atirar."
+    :
+    "Mova o joystick da arma e solte para atirar!"
+  );
+
+};
+
+
+/* ATAQUES DE ÁREA DO BOSS */
+
+function startBossAttack(){
+
+  const attacks=[
+    "onda",
+    "explosao",
+    "investida"
+  ];
+
+  const type=
+    attacks[
+      Math.floor(
+        Math.random()*attacks.length
+      )
+    ];
+
+  const size=
+    type==="onda"
+    ?
+    260
+    :
+    type==="explosao"
+    ?
+    360
+    :
+    180;
+
+  bossAttackType=type;
+
+  bossAttackArea.style.display="block";
+
+  bossAttackArea.style.width=size+"px";
+  bossAttackArea.style.height=size+"px";
+
+  bossAttackArea.style.left=
+    (bossX-size/2)+"px";
+
+  bossAttackArea.style.top=
+    (bossY-size/2)+"px";
+
+  bossWarning.style.display="block";
+
+  bossWarning.textContent=
+    type==="onda"
+    ?
+    "⚠️ ONDA DE IMPACTO! DESVIE!"
+    :
+    type==="explosao"
+    ?
+    "⚠️ EXPLOSÃO! SAIA DA ÁREA!"
+    :
+    "⚠️ INVESTIDA! SAIA DA FRENTE!";
+
+  bossAttackTimer=900;
+
+}
+
+
+function executeBossAttack(){
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  const d=
+    distance(
+      playerX,
+      playerY,
+      bossX,
+      bossY
+    );
+
+  if(
+    bossAttackType==="onda" &&
+    d<130
+  )
+    damagePlayer(25);
+
+  if(
+    bossAttackType==="explosao" &&
+    d<190
+  )
+    damagePlayer(32);
+
+  if(
+    bossAttackType==="investida" &&
+    d<110
+  )
+    damagePlayer(38);
+
+  bossAttackType="";
+
+  bossAttackTimer=
+    1700+
+    Math.random()*800;
+
+}
+
+
+/* PROJÉTEIS DO BOSS */
+
+function fireBossProjectile(){
+
+  if(
+    !bossActive ||
+    difficulty!=="hard" ||
+    paused
+  )return;
+
+  const dx=
+    playerX-bossX;
+
+  const dy=
+    playerY-bossY;
+
+  const d=
+    Math.hypot(dx,dy);
+
+  if(d<1)
+    return;
+
+  const ux=dx/d;
+  const uy=dy/d;
+
+  const p=
+    document.createElement("div");
+
+  p.className="bossProjectile";
+
+  world.appendChild(p);
+
+  const projectile={
+    element:p,
+    x:bossX,
+    y:bossY,
+    ux:ux,
+    uy:uy,
+    speed:.48,
+    life:0
+  };
+
+  bossProjectiles.push(projectile);
+
+}
+
+
+function updateBossProjectiles(delta){
+
+  if(
+    !bossActive ||
+    difficulty!=="hard" ||
+    paused
+  )return;
+
+  for(
+    let i=bossProjectiles.length-1;
+    i>=0;
+    i--
+  ){
+
+    const p=
+      bossProjectiles[i];
+
+    p.x+=
+      p.ux*
+      p.speed*
+      delta;
+
+    p.y+=
+      p.uy*
+      p.speed*
+      delta;
+
+    p.life+=delta;
+
+    p.element.style.left=
+      p.x+"px";
+
+    p.element.style.top=
+      p.y+"px";
+
+    const d=
+      distance(
+        p.x,
+        p.y,
+        playerX,
+        playerY
+      );
+
+    if(d<30){
+
+      p.element.remove();
+
+      bossProjectiles.splice(i,1);
+
+      bossProjectileHits++;
+
+      if(bossProjectileHits>=2){
+
+        showNotification(
+          "☠️ Você foi atingido duas vezes pelo Alfa!"
+        );
+
+        hp=0;
+
+        updateBars();
+
+        die();
+
+        return;
+
+      }
+
+      hp=Math.max(
+        1,
+        hp-30
+      );
+
+      updateBars();
+
+      showNotification(
+        "💥 PROJÉTIL ACERTOU! "+
+        bossProjectileHits+
+        "/2"
+      );
+
+      continue;
+
+    }
+
+    if(
+      p.life>5000 ||
+      p.x<0 ||
+      p.x>3000 ||
+      p.y<0 ||
+      p.y>2000
+    ){
+
+      p.element.remove();
+
+      bossProjectiles.splice(i,1);
+
+    }
+
+  }
+
+}
+
+
+/* ATUALIZAR BOSS */
+
+function updateBoss(delta){
+
+  if(
+    !bossActive ||
+    paused
+  )
+    return;
+
+  const d=
+    distance(
+      bossX,
+      bossY,
+      playerX,
+      playerY
+    );
+
+  if(d>140){
+
+    const dx=
+      (playerX-bossX)/d;
+
+    const dy=
+      (playerY-bossY)/d;
+
+    bossX+=
+      dx*.025*delta;
+
+    bossY+=
+      dy*.025*delta;
+
+  }
+
+  boss.style.left=
+    bossX+"px";
+
+  boss.style.top=
+    bossY+"px";
+
+
+  bossAttackTimer-=delta;
+
+  if(
+    bossAttackTimer<=0 &&
+    bossAttackType===""
+  ){
+
+    startBossAttack();
+
+  }
+
+  if(
+    bossAttackType!=="" &&
+    bossAttackTimer<=0
+  ){
+
+    executeBossAttack();
+
+  }
+
+
+  if(
+    difficulty==="hard"
+  ){
+
+    bossProjectileTimer-=delta;
+
+    if(
+      bossProjectileTimer<=0
+    ){
+
+      fireBossProjectile();
+
+      bossProjectileTimer=
+        2100+
+        Math.random()*1000;
+
+    }
+
+  }
+
+
+  if(d<85){
+
+    damagePlayer(12);
+
+  }
+
+
+}
+
+
+function damageBoss(amount){
+
+  if(
+    !bossActive ||
+    paused
+  )return;
+
+  bossHP=Math.max(
+    0,
+    bossHP-amount
+  );
+
+  bossFill.style.width=
+    (bossHP/300*100)+"%";
+
+  boss.style.filter=
+    "brightness(2)";
+
+  setTimeout(()=>{
+    if(bossActive)
+      boss.style.filter="";
+  },90);
+
+  if(bossHP<=0){
+
+    defeatBoss();
+
+  }
+
+}
+
+
+function defeatBoss(){
+
+  bossActive=false;
+  bossDefeated=true;
+
+  boss.style.display="none";
+
+  bossUI.style.display="none";
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  weaponJoystickArea.style.display="none";
+
+  resetWeaponJoystick();
+
+  attackButton.style.display="block";
+
+  bossProjectiles.forEach(
+    p=>p.element.remove()
+  );
+
+  bossProjectiles=[];
+
+  objective=7;
+
+  updateMission();
+
+  showNotification(
+    "🔥 Infectado Alfa derrotado! A Torre de Rádio está liberada!"
+  );
+
+}
+
+
+function checkBossTrigger(){
+
+  if(
+    objective!==6 ||
+    bossActive ||
+    bossDefeated ||
+    paused
+  )return;
+
+  const tower={
+    x:1370,
+    y:1640,
+    width:260,
+    height:180
+  };
+
+  if(
+    distanceToRect(
+      playerX,
+      playerY,
+      tower
+    )<190
+  ){
+
+    startBoss();
+
+  }
+
+}
+
+
+/* TIMER */
+
+function updateTimer(delta){
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+  gameTime+=delta;
+
+  if(
+    gameTime>=TOTAL_TIME
+  ){
+
+    gameTime=TOTAL_TIME;
+
+    timer.textContent="00:00";
+
+    timeUp();
+
+    return;
+
+  }
+
+  const remaining=
+    Math.ceil(
+      (TOTAL_TIME-gameTime)/1000
+    );
+
+  const minutes=
+    Math.floor(
+      remaining/60
+    );
+
+  const seconds=
+    remaining%60;
+
+  timer.textContent=
+    String(minutes).padStart(2,"0")
+    +
+    ":"
+    +
+    String(seconds).padStart(2,"0");
+
+  updateWave();
+
+}
+
+
+/* RESETAR PARTIDA SEM RECARREGAR A PÁGINA */
+
+function resetGameToStart(){
+
+  gameStarted=false;
+  gameOverState=false;
+  paused=false;
+
+  stopKnife();
+
+  joystickActive=false;
+  weaponJoystickActive=false;
+
+  resetJoystick();
+  resetWeaponJoystick();
+
+  inventory.style.display="none";
+
+  interactButton.style.display="none";
+  weaponInfo.style.display="none";
+  weaponJoystickArea.style.display="none";
+  pauseButton.style.display="none";
+
+  pauseScreen.style.display="none";
+  bossIntro.style.display="none";
+  deathScreen.style.display="none";
+  timeUpScreen.style.display="none";
+  endScreen.style.display="none";
+
+  startScreen.style.display="flex";
+  difficultyScreen.style.display="none";
+
+  bossActive=false;
+  bossDefeated=false;
+  bossHP=300;
+
+  boss.style.display="none";
+  bossUI.style.display="none";
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  bossProjectiles.forEach(
+    p=>p.element.remove()
+  );
+
+  bossProjectiles=[];
+
+  zombies.forEach(
+    z=>z.element.remove()
+  );
+
+  zombies=[];
+
+  document
+    .querySelectorAll(".resource")
+    .forEach(
+      r=>r.classList.remove("hidden")
+    );
+
+  document
+    .querySelectorAll(".place")
+    .forEach(
+      e=>e.classList.remove("near")
+    );
+
+  nearbyPlace=null;
+
+  objective=0;
+
+  playerX=520;
+  playerY=400;
+
+  hp=100;
+  hunger=100;
+  thirst=100;
+
+  food=2;
+  water=2;
+  medicine=0;
+
+  pistol=0;
+  shotgun=0;
+  ammo=0;
+
+  crowbar=false;
+  accessCard=false;
+  fireKey=false;
+  garageKey=false;
+  warehouseCode=false;
+  radioBattery=false;
+
+  gameTime=0;
+  hungerTimer=0;
+  knifeCooldown=0;
+
+  currentWave=1;
+
+  waveSpeedMultiplier=1;
+  waveDamage=5;
+
+  invincibleUntil=0;
+
+  bossAttackTimer=0;
+  bossProjectileTimer=0;
+  bossProjectileHits=0;
+
+  difficulty="hard";
+
+  TOTAL_TIME=120000;
+  MAX_WAVES=3;
+
+  timer.textContent="02:00";
+  waveElement.textContent="ONDA 1 / 3";
+
+  setHeldItem("");
+
+  updatePlayer();
+  updateBars();
+  updateInventory();
+  updateMission();
+
+  updateCamera();
+
+  hideAim();
+
+  showNotification("");
+
+}
+
+
+/* TEMPO ESGOTADO */
+
+function timeUp(){
+
+  if(gameOverState)
+    return;
+
+  gameOverState=true;
+  gameStarted=false;
+  paused=false;
+
+  stopKnife();
+
+  resetJoystick();
+  resetWeaponJoystick();
+
+  interactButton.style.display="none";
+  weaponInfo.style.display="none";
+  weaponJoystickArea.style.display="none";
+  pauseButton.style.display="none";
+
+  inventory.style.display="none";
+
+  bossProjectiles.forEach(
+    p=>p.element.remove()
+  );
+
+  bossProjectiles=[];
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  timeUpScreen.style.display="flex";
+
+}
+
+
+/* FINAL */
+
+function finishGame(){
+
+  gameStarted=false;
+  gameOverState=true;
+  paused=false;
+
+  stopKnife();
+
+  interactButton.style.display="none";
+  weaponInfo.style.display="none";
+  weaponJoystickArea.style.display="none";
+  pauseButton.style.display="none";
+
+  inventory.style.display="none";
+
+  endScreen.style.display="flex";
+
+}
+
+
+/* MORTE */
+
+function die(){
+
+  if(gameOverState)
+    return;
+
+  gameOverState=true;
+  gameStarted=false;
+  paused=false;
+
+  stopKnife();
+
+  resetJoystick();
+  resetWeaponJoystick();
+
+  interactButton.style.display="none";
+
+  weaponInfo.style.display="none";
+
+  weaponJoystickArea.style.display="none";
+
+  pauseButton.style.display="none";
+
+  inventory.style.display="none";
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  bossProjectiles.forEach(
+    p=>p.element.remove()
+  );
+
+  bossProjectiles=[];
+
+  deathScreen.style.display="flex";
+
+}
+
+
+/* PAUSA */
+
+function pauseGame(){
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+  paused=true;
+
+  stopKnife();
+
+  joystickActive=false;
+  weaponJoystickActive=false;
+
+  resetJoystick();
+  resetWeaponJoystick();
+
+  inventory.style.display="none";
+
+  interactButton.style.display="none";
+
+  pauseScreen.style.display="flex";
+
+}
+
+
+function resumeGame(){
+
+  if(
+    !paused ||
+    gameOverState
+  )return;
+
+  paused=false;
+
+  pauseScreen.style.display="none";
+
+  lastTime=performance.now();
+
+  checkNearbyPlace();
+
+}
+
+
+pauseButton.onclick=()=>{
+
+  pauseGame();
+
+};
+
+
+resumeButton.onclick=()=>{
+
+  resumeGame();
+
+};
+
+
+/* BOTÕES DE REINÍCIO */
+
+pauseRestartButton.onclick=e=>{
+
+  e.preventDefault();
+
+  resetGameToStart();
+
+};
+
+
+deathRestartButton.onclick=e=>{
+
+  e.preventDefault();
+
+  resetGameToStart();
+
+};
+
+
+timeRestartButton.onclick=e=>{
+
+  e.preventDefault();
+
+  resetGameToStart();
+
+};
+
+
+restartButton.onclick=e=>{
+
+  e.preventDefault();
+
+  resetGameToStart();
+
+};
+
+
+/* DIFICULDADE */
+
+startButton.onclick=()=>{
+
+  startScreen.style.display="none";
+
+  difficultyScreen.style.display="flex";
+
+};
+
+
+document
+.querySelectorAll(".difficulty")
+.forEach(button=>{
+
+  button.addEventListener(
+    "click",
+    ()=>{
+      startGame(
+        button.dataset.diff
+      );
+    }
+  );
+
+});
+
+
+/* INICIAR */
+
+function startGame(diff){
+
+  difficulty=diff;
+
+  if(diff==="easy"){
+
+    TOTAL_TIME=180000;
+    MAX_WAVES=2;
+
+  }
+
+  else if(diff==="medium"){
+
+    TOTAL_TIME=180000;
+    MAX_WAVES=3;
+
+  }
+
+  else{
+
+    TOTAL_TIME=120000;
+    MAX_WAVES=3;
+
+  }
+
+  difficultyScreen.style.display="none";
+
+  gameStarted=true;
+  gameOverState=false;
+  paused=false;
+
+  objective=0;
+
+  playerX=520;
+  playerY=400;
+
+  hp=100;
+  hunger=100;
+  thirst=100;
+
+  food=2;
+  water=2;
+  medicine=0;
+
+  pistol=0;
+  shotgun=0;
+  ammo=0;
+
+  crowbar=false;
+  accessCard=false;
+  fireKey=false;
+  garageKey=false;
+  warehouseCode=false;
+  radioBattery=false;
+
+  bossActive=false;
+  bossDefeated=false;
+  bossHP=300;
+
+  bossProjectileHits=0;
+  bossProjectileTimer=0;
+
+  bossProjectiles.forEach(
+    p=>p.element.remove()
+  );
+
+  bossProjectiles=[];
+
+  gameTime=0;
+  hungerTimer=0;
+
+  currentWave=1;
+
+  waveSpeedMultiplier=1;
+  waveDamage=5;
+
+  knifeCooldown=0;
+
+  timer.textContent=
+    TOTAL_TIME===180000
+    ?
+    "03:00"
+    :
+    "02:00";
+
+  waveElement.textContent=
+    "ONDA 1 / "+MAX_WAVES;
+
+  document
+    .querySelectorAll(".resource")
+    .forEach(
+      r=>r.classList.remove("hidden")
+    );
+
+  setHeldItem("");
+
+  boss.style.display="none";
+  bossUI.style.display="none";
+
+  bossAttackArea.style.display="none";
+  bossWarning.style.display="none";
+
+  weaponJoystickArea.style.display="none";
+
+  attackButton.style.display="block";
+
+  resetWeaponJoystick();
+
+  createZombies();
+
+  updatePlayer();
+  updateBars();
+  updateInventory();
+  updateMission();
+
+  resetJoystick();
+
+  weaponInfo.style.display="none";
+
+  pauseButton.style.display="block";
+
+  pauseScreen.style.display="none";
+  deathScreen.style.display="none";
+  timeUpScreen.style.display="none";
+  endScreen.style.display="none";
+  bossIntro.style.display="none";
+
+  lastTime=performance.now();
+
+  showNotification(
+    TOTAL_TIME===180000
+    ?
+    "Você tem 3 minutos. Encontre uma forma de transmitir o sinal!"
+    :
+    "Você tem 2 minutos. Encontre uma forma de transmitir o sinal!"
+  );
+
+}
+
+
+/* LOOP */
+
+function loop(time){
+
+  if(!lastTime)
+    lastTime=time;
+
+  const delta=
+    Math.min(
+      time-lastTime,
+      50
+    );
+
+  lastTime=time;
+
+  if(
+    gameStarted &&
+    !gameOverState &&
+    !paused
+  ){
+
+    updateTimer(delta);
+
+    movePlayer(delta);
+
+    updateCamera();
+
+    checkNearbyPlace();
+
+    collectResources();
+
+    updateZombies(delta);
+
+    updateBoss(delta);
+
+    updateBossProjectiles(delta);
+
+    updateNeeds(delta);
+
+    checkBossTrigger();
+
+    if(knifeCooldown>0){
+
+      knifeCooldown=
+        Math.max(
+          0,
+          knifeCooldown-delta
+        );
+
+    }
+
+  }
+
+  requestAnimationFrame(loop);
+
+}
+
+
+/* INICIALIZAÇÃO */
+
+updatePlayer();
+updateBars();
+updateInventory();
+updateMission();
+resetJoystick();
+resetWeaponJoystick();
+
+requestAnimationFrame(loop);
+
+</script>
+
+</body>
+</html>
