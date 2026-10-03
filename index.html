@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -44,6 +45,48 @@ button{
     linear-gradient(#ffffff08 1px,transparent 1px),
     linear-gradient(90deg,#ffffff08 1px,transparent 1px);
   background-size:50px 50px;
+}
+
+/* TELA PARA CELULAR EM PÉ */
+
+#rotateScreen{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#101313;
+  z-index:99999;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:30px;
+}
+
+#rotateScreen .rotateIcon{
+  font-size:70px;
+  margin-bottom:20px;
+  animation:rotatePhone 1.5s ease-in-out infinite;
+}
+
+#rotateScreen h2{
+  font-size:28px;
+  margin-bottom:12px;
+}
+
+#rotateScreen p{
+  color:#bbb;
+  max-width:350px;
+  line-height:1.5;
+}
+
+@keyframes rotatePhone{
+  0%,100%{
+    transform:rotate(0deg);
+  }
+
+  50%{
+    transform:rotate(90deg);
+  }
 }
 
 /* MAPA */
@@ -214,6 +257,7 @@ button{
     opacity:1;
     transform:scaleX(.45);
   }
+
   to{
     opacity:0;
     transform:scaleX(1.15);
@@ -259,39 +303,99 @@ button{
   box-shadow:0 0 12px #b52d2d;
 }
 
-/* RADIO */
+/* MUTANTE */
+
+.zombie.mutant{
+  width:46px;
+  height:46px;
+  margin:-23px;
+  background:#a51f2b;
+  border:5px solid #4a0c13;
+  box-shadow:
+    0 0 12px #ff1f35,
+    0 0 25px #b00018;
+  z-index:55;
+}
+
+.zombie.mutant:before,
+.zombie.mutant:after{
+  width:8px;
+  height:8px;
+  top:9px;
+  background:#fff;
+  box-shadow:0 0 6px #ff4444;
+}
+
+.zombie.mutant:before{
+  left:6px;
+}
+
+.zombie.mutant:after{
+  right:6px;
+}
+
+/* BARRA DE VIDA DO MUTANTE */
+
+.mutantHealthBar{
+  position:absolute;
+  width:42px;
+  height:6px;
+  left:50%;
+  top:-16px;
+  transform:translateX(-50%);
+  background:#181818;
+  border:1px solid #000;
+  border-radius:5px;
+  overflow:hidden;
+  z-index:200;
+  pointer-events:none;
+}
+
+.mutantHealthFill{
+  height:100%;
+  width:100%;
+  background:#39d353;
+  transition:width .12s linear;
+}
+
+/* RÁDIO DROPADO */
 
 #radio{
   position:absolute;
-  left:1405px;
-  top:1685px;
-  width:75px;
-  height:55px;
+  display:none;
+  width:58px;
+  height:45px;
+  margin:-22px -29px;
   background:#222;
-  border:4px solid #555;
+  border:4px solid #777;
   border-radius:8px;
-  z-index:20;
+  z-index:45;
+  box-shadow:
+    0 0 10px #e3bd42,
+    0 0 22px #e3bd4266;
 }
 
 #radio:before{
   content:"";
   position:absolute;
-  left:12px;
-  top:13px;
-  width:30px;
-  height:20px;
+  left:8px;
+  top:10px;
+  width:25px;
+  height:17px;
   background:#c5a832;
+  border-radius:2px;
 }
 
 #radio:after{
   content:"";
   position:absolute;
   width:4px;
-  height:30px;
+  height:28px;
   background:#aaa;
-  right:8px;
-  top:-28px;
+  right:7px;
+  top:-25px;
   transform:rotate(15deg);
+  transform-origin:bottom;
 }
 
 /* HUD */
@@ -804,16 +908,6 @@ button{
   z-index:850;
 }
 
-#bossAttackArea{
-  position:absolute;
-  display:none;
-  border:4px solid #ed4141;
-  border-radius:50%;
-  background:#ed414122;
-  z-index:70;
-  pointer-events:none;
-}
-
 #weaponInfo{
   position:fixed;
   display:none;
@@ -935,10 +1029,158 @@ button{
   }
 }
 
+@media (orientation:portrait){
+  #rotateScreen{
+    display:flex;
+  }
+}
+
+@media (orientation:landscape) and (max-height:600px){
+
+  #hud{
+    left:8px;
+    top:8px;
+    width:155px;
+    padding:7px;
+  }
+
+  #timerBox{
+    right:8px;
+    top:8px;
+    width:90px;
+    padding:7px;
+  }
+
+  #timer{
+    font-size:22px;
+  }
+
+  #mission{
+    top:8px;
+    left:50%;
+    width:min(430px,55vw);
+    padding:7px 10px;
+    font-size:11px;
+  }
+
+  #missionTitle{
+    margin-bottom:3px;
+  }
+
+  #pauseButton{
+    top:78px;
+    right:8px;
+    width:42px;
+    height:42px;
+    font-size:17px;
+  }
+
+  #joystickArea{
+    width:125px;
+    height:125px;
+    left:18px;
+    bottom:15px;
+  }
+
+  #joystick{
+    width:58px;
+    height:58px;
+  }
+
+  #actions{
+    right:15px;
+    bottom:15px;
+    gap:8px;
+  }
+
+  .action{
+    width:62px;
+    height:62px;
+  }
+
+  #weaponJoystickArea{
+    width:105px;
+    height:105px;
+    right:92px;
+    bottom:15px;
+  }
+
+  #weaponJoystick{
+    width:48px;
+    height:48px;
+  }
+
+  #interactButton{
+    bottom:90px;
+    padding:11px 22px;
+    font-size:13px;
+  }
+
+  #weaponInfo{
+    right:210px;
+    bottom:20px;
+  }
+
+  #bossUI{
+    top:65px;
+    width:min(450px,55vw);
+  }
+
+  #bossWarning{
+    top:112px;
+    font-size:12px;
+  }
+
+  .screen{
+    padding:15px;
+  }
+
+  .screen h1{
+    font-size:42px;
+    margin-bottom:10px;
+  }
+
+  .screen h2{
+    font-size:25px;
+    margin-bottom:10px;
+  }
+
+  .screen p{
+    margin-bottom:8px;
+    line-height:1.3;
+  }
+
+  .difficulty{
+    width:150px;
+    min-height:105px;
+    padding:10px;
+  }
+
+  .difficulty strong{
+    font-size:18px;
+  }
+
+  .difficultyButtons{
+    gap:8px;
+  }
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="rotateScreen">
+
+  <div class="rotateIcon">📱</div>
+
+  <h2>Gire o celular</h2>
+
+  <p>
+    Último Refúgio foi feito para ser jogado com o celular deitado.
+  </p>
+
+</div>
 
 <div id="game">
 
@@ -951,62 +1193,25 @@ button{
 <div class="road v" style="left:1470px"></div>
 <div class="road v" style="left:2110px"></div>
 
-<div id="house" class="place house">
-CASA ABANDONADA
-</div>
+<div id="house" class="place house">CASA ABANDONADA</div>
+<div id="house2" class="place house2">CASA DO BAIRRO</div>
+<div id="market" class="place market">MERCADO CENTRAL</div>
+<div id="pharmacy" class="place pharmacy">FARMÁCIA</div>
 
-<div id="house2" class="place house2">
-CASA DO BAIRRO
-</div>
+<div id="police" class="place police">DELEGACIA</div>
+<div id="hospital" class="place hospital">HOSPITAL MUNICIPAL</div>
+<div id="fire" class="place fire">CORPO DE BOMBEIROS</div>
+<div id="garage" class="place garage">OFICINA MECÂNICA</div>
 
-<div id="market" class="place market">
-MERCADO CENTRAL
-</div>
+<div id="warehouse" class="place warehouse">GALPÃO INDUSTRIAL</div>
+<div id="apartment" class="place apartment">PRÉDIO RESIDENCIAL</div>
+<div id="gas" class="place gas">POSTO DE GASOLINA</div>
+<div id="shelter" class="place shelter">ABRIGO</div>
 
-<div id="pharmacy" class="place pharmacy">
-FARMÁCIA
-</div>
-
-<div id="police" class="place police">
-DELEGACIA
-</div>
-
-<div id="hospital" class="place hospital">
-HOSPITAL MUNICIPAL
-</div>
-
-<div id="fire" class="place fire">
-CORPO DE BOMBEIROS
-</div>
-
-<div id="garage" class="place garage">
-OFICINA MECÂNICA
-</div>
-
-<div id="warehouse" class="place warehouse">
-GALPÃO INDUSTRIAL
-</div>
-
-<div id="apartment" class="place apartment">
-PRÉDIO RESIDENCIAL
-</div>
-
-<div id="gas" class="place gas">
-POSTO DE GASOLINA
-</div>
-
-<div id="shelter" class="place shelter">
-ABRIGO
-</div>
-
-<div id="tower" class="place tower">
-TORRE DE RÁDIO
-</div>
+<div id="tower" class="place tower">TORRE DE RÁDIO</div>
 
 <div id="radio"></div>
-
 <div id="boss"></div>
-
 <div id="bossAttackArea"></div>
 
 <div id="aimTrail"></div>
@@ -1045,29 +1250,19 @@ TORRE DE RÁDIO
 
 <div id="timerBox">
 
-<div id="timerLabel">
-TEMPO RESTANTE
-</div>
+<div id="timerLabel">TEMPO RESTANTE</div>
 
-<div id="timer">
-02:00
-</div>
+<div id="timer">02:00</div>
 
-<div id="wave">
-ONDA 1 / 3
-</div>
+<div id="wave">ONDA 1 / 3</div>
 
 </div>
 
-<button id="pauseButton">
-⏸️
-</button>
+<button id="pauseButton">⏸️</button>
 
 <div id="mission">
 
-<div id="missionTitle">
-OBJETIVO
-</div>
+<div id="missionTitle">OBJETIVO</div>
 
 <div id="missionText"></div>
 
@@ -1075,9 +1270,7 @@ OBJETIVO
 
 <div id="bossUI">
 
-<div id="bossName">
-☠️ INFECTADO ALFA
-</div>
+<div id="bossName">☠️ INFECTADO ALFA</div>
 
 <div id="bossBar">
 <div id="bossFill"></div>
@@ -1115,15 +1308,11 @@ EXPLORAR
 
 <div id="notification"></div>
 
-<!-- MOCHILA -->
-
 <div id="inventory">
 
 <div class="inventoryBox">
 
-<div class="inventoryTitle">
-🎒 MOCHILA
-</div>
+<div class="inventoryTitle">🎒 MOCHILA</div>
 
 <div class="itemRow">
 <span>🥫 Comida</span>
@@ -1194,6 +1383,11 @@ EXPLORAR
 <b id="batteryCount">0</b>
 </div>
 
+<div class="itemRow">
+<span>📻 Rádio</span>
+<b id="radioCount">0</b>
+</div>
+
 <button id="closeInventory" class="closeButton">
 FECHAR
 </button>
@@ -1201,21 +1395,13 @@ FECHAR
 </div>
 </div>
 
-<!-- TELA INICIAL -->
-
 <div id="startScreen" class="screen">
 
-<h1>
-ÚLTIMO REFÚGIO
-</h1>
+<h1>ÚLTIMO REFÚGIO</h1>
 
-<p>
-A cidade caiu. Os infectados tomaram as ruas.
-</p>
+<p>A cidade caiu. Os infectados tomaram as ruas.</p>
 
-<p>
-Escolha a dificuldade para começar.
-</p>
+<p>Escolha a dificuldade para começar.</p>
 
 <button id="startButton" class="mainButton">
 ESCOLHER DIFICULDADE
@@ -1223,25 +1409,19 @@ ESCOLHER DIFICULDADE
 
 </div>
 
-<!-- DIFICULDADES -->
-
 <div id="difficultyScreen" class="screen">
 
-<h2>
-ESCOLHA A DIFICULDADE
-</h2>
+<h2>ESCOLHA A DIFICULDADE</h2>
 
 <p>
-A dificuldade altera o tempo e a quantidade de ondas.
+A dificuldade altera o tempo, a quantidade de infectados e os ataques do Alfa.
 </p>
 
 <div class="difficultyButtons">
 
 <button class="difficulty" data-diff="easy">
 
-<strong>
-🟢 FÁCIL
-</strong>
+<strong>🟢 FÁCIL</strong>
 
 <small>
 3 minutos<br>
@@ -1253,9 +1433,7 @@ Sem onda 3
 
 <button class="difficulty" data-diff="medium">
 
-<strong>
-🟡 MÉDIO
-</strong>
+<strong>🟡 MÉDIO</strong>
 
 <small>
 3 minutos<br>
@@ -1267,9 +1445,7 @@ Infectados mais fortes
 
 <button class="difficulty" data-diff="hard">
 
-<strong>
-🔴 DIFÍCIL
-</strong>
+<strong>🔴 DIFÍCIL</strong>
 
 <small>
 2 minutos<br>
@@ -1280,17 +1456,28 @@ Mais infectados
 
 </button>
 
-</div>
+<button class="difficulty" data-diff="extreme">
+
+<strong>☠️ EXTREME</strong>
+
+<small>
+2 minutos<br>
+3 ondas<br>
+Boss 25% mais rápido<br>
+Ataque radial ✳️<br>
+Mais infectados<br>
+☠️ Zumbis mutantes
+</small>
+
+</button>
 
 </div>
 
-<!-- BOSS -->
+</div>
 
 <div id="bossIntro" class="screen">
 
-<h2>
-⚠️ INFECTADO ALFA
-</h2>
+<h2>⚠️ INFECTADO ALFA</h2>
 
 <p>
 Uma criatura muito mais forte está protegendo a região da torre.
@@ -1302,7 +1489,7 @@ Você encontrou armas no galpão.
 
 <p>
 Na dificuldade Difícil, o Alfa também dispara projéteis.
-Desvie deles!
+No Extreme, ele é 25% mais rápido e pode disparar uma rajada radial em 8 direções.
 </p>
 
 <button id="continueBossButton" class="mainButton">
@@ -1311,17 +1498,11 @@ ENFRENTAR
 
 </div>
 
-<!-- PAUSA -->
-
 <div id="pauseScreen" class="screen">
 
-<h2>
-⏸️ JOGO PAUSADO
-</h2>
+<h2>⏸️ JOGO PAUSADO</h2>
 
-<p>
-O jogo está completamente pausado.
-</p>
+<p>O jogo está completamente pausado.</p>
 
 <button id="resumeButton" class="mainButton">
 ▶️ CONTINUAR
@@ -1335,21 +1516,13 @@ O jogo está completamente pausado.
 
 </div>
 
-<!-- MORTE -->
-
 <div id="deathScreen" class="screen">
 
-<h2 class="dangerTitle">
-☠️ VOCÊ MORREU
-</h2>
+<h2 class="dangerTitle">☠️ VOCÊ MORREU</h2>
 
-<p>
-Os infectados tomaram conta da região.
-</p>
+<p>Os infectados tomaram conta da região.</p>
 
-<p>
-Sua jornada terminou aqui.
-</p>
+<p>Sua jornada terminou aqui.</p>
 
 <button id="deathRestartButton" class="mainButton">
 🔄 TENTAR NOVAMENTE
@@ -1357,13 +1530,9 @@ Sua jornada terminou aqui.
 
 </div>
 
-<!-- TEMPO ESGOTADO -->
-
 <div id="timeUpScreen" class="screen">
 
-<h2 class="timeTitle">
-⏰ TEMPO ESGOTADO
-</h2>
+<h2 class="timeTitle">⏰ TEMPO ESGOTADO</h2>
 
 <p>
 Os infectados dominaram a região antes que você conseguisse transmitir o sinal.
@@ -1375,21 +1544,13 @@ Os infectados dominaram a região antes que você conseguisse transmitir o sinal
 
 </div>
 
-<!-- FINAL -->
-
 <div id="endScreen" class="screen">
 
-<h2>
-📻 SINAL ENCONTRADO
-</h2>
+<h2>📻 SINAL ENCONTRADO</h2>
 
-<p>
-Você derrotou o Infectado Alfa.
-</p>
+<p>Você derrotou o Infectado Alfa.</p>
 
-<p>
-A torre de rádio finalmente está funcionando.
-</p>
+<p>Você recuperou o rádio e conseguiu ativar a torre.</p>
 
 <p>
 <strong>
@@ -1398,9 +1559,7 @@ A torre de rádio finalmente está funcionando.
 </p>
 
 <p>
-<strong>
-FIM — PARTE 1
-</strong>
+<strong>FIM — PARTE 1</strong>
 </p>
 
 <button id="restartButton" class="mainButton">
@@ -1424,6 +1583,9 @@ const interactButton=document.getElementById("interactButton");
 const missionText=document.getElementById("missionText");
 const notification=document.getElementById("notification");
 const inventory=document.getElementById("inventory");
+
+const radio=document.getElementById("radio");
+const radioCount=document.getElementById("radioCount");
 
 const boss=document.getElementById("boss");
 const bossUI=document.getElementById("bossUI");
@@ -1520,6 +1682,9 @@ let garageKey=false;
 let warehouseCode=false;
 let radioBattery=false;
 
+let radioDropped=false;
+let radioCollected=false;
+
 let bossActive=false;
 let bossDefeated=false;
 let bossHP=300;
@@ -1541,11 +1706,11 @@ let gameTime=0;
 let currentWave=1;
 let difficulty="hard";
 
-let TOTAL_TIME=120000;
-let MAX_WAVES=3;
-
 let waveSpeedMultiplier=1;
 let waveDamage=5;
+
+let TOTAL_TIME=120000;
+let MAX_WAVES=3;
 
 
 /* FACADA */
@@ -1572,11 +1737,33 @@ let weaponAimMoved=false;
 const WEAPON_RANGE=450;
 
 
+/* MIRA PELO MOUSE */
+
+let mouseWeaponActive=false;
+let mouseWeaponX=0;
+let mouseWeaponY=0;
+
+
+/* CONTROLES WASD */
+
+const keys={
+  w:false,
+  a:false,
+  s:false,
+  d:false
+};
+
+
 /* PROJÉTEIS DO BOSS */
 
 let bossProjectiles=[];
 let bossProjectileTimer=0;
 let bossProjectileHits=0;
+
+
+/* ATAQUE RADIAL DO EXTREME */
+
+let bossRadialTimer=0;
 
 
 /* OBJETIVOS */
@@ -1597,12 +1784,47 @@ const missions=[
 
 "Você encontrou armas e munição. Vá até a Torre de Rádio e enfrente o Infectado Alfa.",
 
-"Derrote o Infectado Alfa. Depois vá até a Torre de Rádio e ative o rádio."
+"Derrote o Infectado Alfa e colete o rádio que ele deixou. Depois vá até a Torre de Rádio."
 
 ];
 
+
 function updateMission(){
-  missionText.textContent=missions[Math.min(objective,missions.length-1)];
+
+  if(
+    objective===7 &&
+    bossDefeated &&
+    !radioCollected
+  ){
+
+    missionText.textContent=
+      "Derrote o Infectado Alfa e colete o rádio que ele deixou. Depois vá até a Torre de Rádio.";
+
+    return;
+
+  }
+
+  if(
+    objective===7 &&
+    bossDefeated &&
+    radioCollected
+  ){
+
+    missionText.textContent=
+      "Rádio recuperado! Vá até a Torre de Rádio e ative o sinal.";
+
+    return;
+
+  }
+
+  missionText.textContent=
+    missions[
+      Math.min(
+        objective,
+        missions.length-1
+      )
+    ];
+
 }
 
 
@@ -1715,7 +1937,7 @@ function updatePlayer(){
 }
 
 
-function updateCamera(){
+function getCameraPosition(){
 
   const sw=innerWidth;
   const sh=innerHeight;
@@ -1736,8 +1958,20 @@ function updateCamera(){
     )
   );
 
+  return {
+    x:cx,
+    y:cy
+  };
+
+}
+
+
+function updateCamera(){
+
+  const camera=getCameraPosition();
+
   world.style.transform=
-    `translate(${-cx}px,${-cy}px)`;
+    `translate(${-camera.x}px,${-camera.y}px)`;
 
 }
 
@@ -1751,11 +1985,13 @@ function updateJoystick(x,y){
   let dx=x-(r.left+r.width/2);
   let dy=y-(r.top+r.height/2);
 
-  const rad=r.width/2-32;
+  const rad=
+    r.width/2-
+    joystick.offsetWidth/2;
 
   const d=Math.hypot(dx,dy);
 
-  if(d>rad){
+  if(d>rad && d>0){
     dx=dx/d*rad;
     dy=dy/d*rad;
   }
@@ -1764,10 +2000,10 @@ function updateJoystick(x,y){
   joystickY=dy/rad;
 
   joystick.style.left=
-    (r.width/2-32+dx)+"px";
+    (r.width/2-joystick.offsetWidth/2+dx)+"px";
 
   joystick.style.top=
-    (r.height/2-32+dy)+"px";
+    (r.height/2-joystick.offsetHeight/2+dy)+"px";
 
 }
 
@@ -1777,11 +2013,17 @@ function resetJoystick(){
   joystickX=0;
   joystickY=0;
 
+  const r=
+    joystickArea.getBoundingClientRect();
+
+  const knob=
+    joystick.offsetWidth/2;
+
   joystick.style.left=
-    innerWidth<=600 ? "30px":"40px";
+    (r.width/2-knob)+"px";
 
   joystick.style.top=
-    innerWidth<=600 ? "30px":"40px";
+    (r.height/2-knob)+"px";
 
 }
 
@@ -1843,20 +2085,58 @@ function movePlayer(delta){
     paused
   )return;
 
-  const d=Math.hypot(
-    joystickX,
-    joystickY
-  );
+  let moveX=0;
+  let moveY=0;
 
-  if(d>.01){
+  /* WASD */
 
-    const dx=joystickX/d;
-    const dy=joystickY/d;
+  if(keys.a) moveX-=1;
+  if(keys.d) moveX+=1;
+  if(keys.w) moveY-=1;
+  if(keys.s) moveY+=1;
+
+  const keyboardActive=
+    moveX!==0 ||
+    moveY!==0;
+
+  /*
+    Se estiver usando WASD, ele assume o controle.
+    Caso contrário, continua usando o joystick mobile.
+  */
+
+  if(keyboardActive){
+
+    const d=Math.hypot(
+      moveX,
+      moveY
+    );
+
+    moveX/=d;
+    moveY/=d;
 
     const speed=.19*delta;
 
-    playerX+=dx*speed;
-    playerY+=dy*speed;
+    playerX+=moveX*speed;
+    playerY+=moveY*speed;
+
+  }else{
+
+    const d=Math.hypot(
+      joystickX,
+      joystickY
+    );
+
+    if(d>.01){
+
+      const dx=joystickX/d;
+      const dy=joystickY/d;
+
+      const speed=.19*delta;
+
+      playerX+=dx*speed;
+      playerY+=dy*speed;
+
+    }
 
   }
 
@@ -1873,6 +2153,94 @@ function movePlayer(delta){
   updatePlayer();
 
 }
+
+
+/* TECLADO DO PC */
+
+document.addEventListener("keydown",e=>{
+
+  const tag=
+    document.activeElement &&
+    document.activeElement.tagName;
+
+  if(
+    tag==="INPUT" ||
+    tag==="TEXTAREA"
+  )return;
+
+  const key=e.key.toLowerCase();
+
+  if(
+    key==="w" ||
+    key==="a" ||
+    key==="s" ||
+    key==="d"
+  ){
+
+    e.preventDefault();
+
+    keys[key]=true;
+
+  }
+
+
+  /* ESPAÇO = EXPLORAR */
+
+  if(
+    e.code==="Space" &&
+    !e.repeat
+  ){
+
+    e.preventDefault();
+
+    if(
+      gameStarted &&
+      !gameOverState &&
+      !paused &&
+      interactButton.style.display!=="none"
+    ){
+
+      interact();
+
+    }
+
+  }
+
+});
+
+
+document.addEventListener("keyup",e=>{
+
+  const key=e.key.toLowerCase();
+
+  if(
+    key==="w" ||
+    key==="a" ||
+    key==="s" ||
+    key==="d"
+  ){
+
+    e.preventDefault();
+
+    keys[key]=false;
+
+  }
+
+});
+
+
+/* LIMPA TECLAS QUANDO A JANELA PERDE FOCO */
+
+window.addEventListener("blur",()=>{
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
+
+  mouseWeaponActive=false;
+
+});
 
 
 /* DISTÂNCIA */
@@ -1948,6 +2316,33 @@ function checkNearbyPlace(){
     .querySelectorAll(".place")
     .forEach(e=>e.classList.remove("near"));
 
+  if(
+    radioDropped &&
+    !radioCollected
+  ){
+
+    const radioDistance=
+      distance(
+        playerX,
+        playerY,
+        parseFloat(radio.style.left),
+        parseFloat(radio.style.top)
+      );
+
+    if(radioDistance<90){
+
+      nearbyPlace="Rádio Dropado";
+
+      interactButton.style.display="block";
+      interactButton.textContent="PEGAR RÁDIO";
+
+      return;
+
+    }
+
+  }
+
+
   let closest=null;
   let closestDistance=Infinity;
 
@@ -2017,7 +2412,8 @@ function checkNearbyPlace(){
       (
         objective===7 &&
         bossDefeated &&
-        radioBattery
+        radioBattery &&
+        radioCollected
       )
       ?
       "ATIVAR RÁDIO"
@@ -2044,15 +2440,50 @@ function interact(){
   )return;
 
 
+  if(nearbyPlace==="Rádio Dropado"){
+
+    radioCollected=true;
+    radioDropped=false;
+
+    radio.style.display="none";
+
+    setHeldItem("📻");
+
+    updateInventory();
+    updateMission();
+
+    showNotification(
+      "📻 Você coletou o rádio! Agora leve-o até a Torre de Rádio."
+    );
+
+    nearbyPlace=null;
+    interactButton.style.display="none";
+
+    return;
+
+  }
+
+
   if(nearbyPlace==="Torre de Rádio"){
 
     if(
       objective===7 &&
       bossDefeated &&
-      radioBattery
+      radioBattery &&
+      radioCollected
     ){
 
       finishGame();
+
+    }else if(
+      objective===7 &&
+      bossDefeated &&
+      !radioCollected
+    ){
+
+      showNotification(
+        "📻 Você precisa coletar o rádio deixado pelo Alfa primeiro."
+      );
 
     }else{
 
@@ -2404,23 +2835,86 @@ const starts=[
 ];
 
 
-/* DIFÍCIL = +20% DE ZUMBIS */
-
-function createZombie(x,y){
+function createZombie(
+  x,
+  y,
+  mutant=false
+){
 
   const e=document.createElement("div");
 
-  e.className="zombie";
+  e.className=
+    mutant
+    ?
+    "zombie mutant"
+    :
+    "zombie";
 
   world.appendChild(e);
 
+  const normalSpeed=
+    .018+
+    Math.random()*.008;
+
   const z={
+
     element:e,
+
     x:x,
     y:y,
-    baseSpeed:.018+Math.random()*.008,
-    attackCooldown:0
+
+    baseSpeed:
+      normalSpeed,
+
+    attackCooldown:0,
+
+    mutant:mutant,
+
+    maxHp:
+      mutant
+      ?
+      3
+      :
+      1,
+
+    hp:
+      mutant
+      ?
+      3
+      :
+      1,
+
+    healthBar:null,
+    healthFill:null
+
   };
+
+  if(mutant){
+
+    const healthBar=
+      document.createElement("div");
+
+    healthBar.className=
+      "mutantHealthBar";
+
+    const healthFill=
+      document.createElement("div");
+
+    healthFill.className=
+      "mutantHealthFill";
+
+    healthBar.appendChild(
+      healthFill
+    );
+
+    e.appendChild(
+      healthBar
+    );
+
+    z.healthBar=healthBar;
+    z.healthFill=healthFill;
+
+  }
 
   zombies.push(z);
 
@@ -2431,21 +2925,51 @@ function createZombie(x,y){
 
 function updateZombieVisual(z){
 
-  z.element.style.left=z.x+"px";
-  z.element.style.top=z.y+"px";
+  z.element.style.left=
+    z.x+"px";
+
+  z.element.style.top=
+    z.y+"px";
 
   z.element.classList.toggle(
     "wave2",
-    currentWave===2
+    currentWave===2 && !z.mutant
   );
 
   z.element.classList.toggle(
     "wave3",
-    currentWave===3
+    currentWave===3 && !z.mutant
   );
+
+  z.element.classList.toggle(
+    "mutant",
+    z.mutant
+  );
+
+  if(
+    z.mutant &&
+    z.healthFill
+  ){
+
+    const percentage=
+      Math.max(
+        0,
+        Math.min(
+          100,
+          (z.hp/z.maxHp)*100
+        )
+      );
+
+    z.healthFill.style.width=
+      percentage+"%";
+
+  }
 
 }
 
+
+/* DIFÍCIL = +20%
+   EXTREME = +5% SOBRE O DIFÍCIL */
 
 function createZombies(){
 
@@ -2457,39 +2981,62 @@ function createZombies(){
 
   let spawnList=[...starts];
 
+  let targetCount=starts.length;
+
   if(difficulty==="hard"){
 
-    const extraCount=Math.ceil(
-      starts.length*.20
-    );
+    targetCount=
+      Math.ceil(
+        starts.length*1.20
+      );
 
-    for(let i=0;i<extraCount;i++){
+  }
 
-      const original=
-        starts[
-          Math.floor(
-            Math.random()*starts.length
-          )
-        ];
+  else if(difficulty==="extreme"){
 
-      spawnList.push([
-        Math.max(
-          30,
-          Math.min(
-            2970,
-            original[0]+(Math.random()*180-90)
-          )
-        ),
-        Math.max(
-          30,
-          Math.min(
-            1970,
-            original[1]+(Math.random()*180-90)
-          )
+    const hardCount=
+      Math.ceil(
+        starts.length*1.20
+      );
+
+    targetCount=
+      Math.ceil(
+        hardCount*1.05
+      );
+
+  }
+
+  const extraCount=
+    targetCount-starts.length;
+
+  for(let i=0;i<extraCount;i++){
+
+    const original=
+      starts[
+        Math.floor(
+          Math.random()*starts.length
         )
-      ]);
+      ];
 
-    }
+    spawnList.push([
+
+      Math.max(
+        30,
+        Math.min(
+          2970,
+          original[0]+(Math.random()*180-90)
+        )
+      ),
+
+      Math.max(
+        30,
+        Math.min(
+          1970,
+          original[1]+(Math.random()*180-90)
+        )
+      )
+
+    ]);
 
   }
 
@@ -2499,6 +3046,74 @@ function createZombies(){
       p[1]
     )
   );
+
+}
+
+
+function spawnPostBossZombies(){
+
+  let amount=0;
+  let mutant=false;
+
+  if(difficulty==="easy"){
+
+    amount=2;
+
+  }
+
+  else if(difficulty==="medium"){
+
+    amount=3;
+
+  }
+
+  else if(difficulty==="hard"){
+
+    amount=5;
+
+  }
+
+  else if(difficulty==="extreme"){
+
+    amount=2;
+    mutant=true;
+
+  }
+
+  for(let i=0;i<amount;i++){
+
+    const angle=
+      Math.random()*Math.PI*2;
+
+    const radius=
+      100+
+      Math.random()*70;
+
+    let x=
+      bossX+
+      Math.cos(angle)*radius;
+
+    let y=
+      bossY+
+      Math.sin(angle)*radius;
+
+    x=Math.max(
+      40,
+      Math.min(2960,x)
+    );
+
+    y=Math.max(
+      40,
+      Math.min(1960,y)
+    );
+
+    createZombie(
+      x,
+      y,
+      mutant
+    );
+
+  }
 
 }
 
@@ -2528,27 +3143,48 @@ function updateZombies(delta){
       const dx=(playerX-z.x)/d;
       const dy=(playerY-z.y)/d;
 
+      const speedMultiplier=
+        z.mutant
+        ?
+        waveSpeedMultiplier*1.25
+        :
+        waveSpeedMultiplier;
+
       z.x+=
         dx*
         z.baseSpeed*
-        waveSpeedMultiplier*
+        speedMultiplier*
         delta;
 
       z.y+=
         dy*
         z.baseSpeed*
-        waveSpeedMultiplier*
+        speedMultiplier*
         delta;
 
     }
 
-    if(d<=52){
+    const attackDistance=
+      z.mutant
+      ?
+      58
+      :
+      52;
+
+    if(d<=attackDistance){
 
       z.attackCooldown-=delta;
 
       if(z.attackCooldown<=0){
 
-        damagePlayer(waveDamage);
+        const damage=
+          z.mutant
+          ?
+          waveDamage*2
+          :
+          waveDamage;
+
+        damagePlayer(damage);
 
         z.attackCooldown=
           Math.max(
@@ -2655,12 +3291,18 @@ function spawnWaveReinforcements(){
     :
     12;
 
-  /* +20% DE REFORÇOS NO DIFÍCIL */
-
   if(difficulty==="hard"){
 
     amount=Math.ceil(
       amount*1.20
+    );
+
+  }
+
+  else if(difficulty==="extreme"){
+
+    amount=Math.ceil(
+      amount*1.20*1.05
     );
 
   }
@@ -2709,7 +3351,7 @@ function spawnWaveReinforcements(){
 }
 
 
-/* FACADA AUTOMÁTICA */
+/* FACADA */
 
 function showKnifeSlash(target){
 
@@ -2789,15 +3431,71 @@ function knifeAttack(){
 
     showKnifeSlash(target);
 
-    target.element.remove();
+    if(target.mutant){
 
-    zombies=
-      zombies.filter(
-        z=>z!==target
-      );
+      target.hp--;
 
-  }
-  else{
+      target.element.style.filter=
+        "brightness(2)";
+
+      setTimeout(()=>{
+
+        if(
+          target.element &&
+          target.element.parentNode
+        ){
+
+          target.element.style.filter="";
+
+        }
+
+      },100);
+
+      if(target.healthFill){
+
+        target.healthFill.style.width=
+          Math.max(
+            0,
+            (target.hp/target.maxHp)*100
+          )+"%";
+
+      }
+
+      if(target.hp<=0){
+
+        target.element.remove();
+
+        zombies=
+          zombies.filter(
+            z=>z!==target
+          );
+
+        showNotification(
+          "🔪 Mutante eliminado!"
+        );
+
+      }else{
+
+        showNotification(
+          "🔪 Mutante atingido! "+
+          target.hp+
+          " facada(s) restante(s)."
+        );
+
+      }
+
+    }else{
+
+      target.element.remove();
+
+      zombies=
+        zombies.filter(
+          z=>z!==target
+        );
+
+    }
+
+  }else{
 
     const fakeTarget={
       x:playerX+50,
@@ -2888,12 +3586,13 @@ function updateWeaponAim(x,y){
     y-(r.top+r.height/2);
 
   const rad=
-    r.width/2-24;
+    r.width/2-
+    weaponJoystick.offsetWidth/2;
 
   const d=
     Math.hypot(dx,dy);
 
-  if(d>rad){
+  if(d>rad && d>0){
 
     dx=dx/d*rad;
     dy=dy/d*rad;
@@ -2904,10 +3603,14 @@ function updateWeaponAim(x,y){
   weaponAimY=dy/rad;
 
   weaponJoystick.style.left=
-    (r.width/2-24+dx)+"px";
+    (r.width/2-
+     weaponJoystick.offsetWidth/2+
+     dx)+"px";
 
   weaponJoystick.style.top=
-    (r.height/2-24+dy)+"px";
+    (r.height/2-
+     weaponJoystick.offsetHeight/2+
+     dy)+"px";
 
   const normalized=
     Math.hypot(
@@ -2966,26 +3669,260 @@ function resetWeaponJoystick(){
   weaponAimY=0;
   weaponAimMoved=false;
 
+  const r=
+    weaponJoystickArea.getBoundingClientRect();
+
+  const knob=
+    weaponJoystick.offsetWidth/2;
+
   weaponJoystick.style.left=
-    innerWidth<=600
-    ?
-    "24px"
-    :
-    "26px";
+    (r.width/2-knob)+"px";
 
   weaponJoystick.style.top=
-    innerWidth<=600
-    ?
-    "24px"
-    :
-    "26px";
+    (r.height/2-knob)+"px";
 
   hideAim();
 
 }
 
 
-/* DISPARO AO SOLTAR */
+/* MIRA PELO MOUSE */
+
+function updateMouseWeaponAim(clientX,clientY){
+
+  if(
+    !gameStarted ||
+    !bossActive ||
+    paused
+  )return;
+
+  const camera=getCameraPosition();
+
+  /*
+    Converte a posição do mouse na tela
+    para a posição correspondente no mundo.
+  */
+
+  const worldMouseX=
+    clientX+camera.x;
+
+  const worldMouseY=
+    clientY+camera.y;
+
+  let dx=
+    worldMouseX-playerX;
+
+  let dy=
+    worldMouseY-playerY;
+
+  const d=
+    Math.hypot(dx,dy);
+
+  if(d<1){
+
+    weaponAimX=0;
+    weaponAimY=0;
+    weaponAimMoved=false;
+
+    hideAim();
+
+    return;
+
+  }
+
+  weaponAimX=dx/d;
+  weaponAimY=dy/d;
+  weaponAimMoved=true;
+
+  const length=WEAPON_RANGE;
+
+  aimTrail.style.display="block";
+
+  aimTrail.style.left=
+    playerX+"px";
+
+  aimTrail.style.top=
+    playerY+"px";
+
+  aimTrail.style.width=
+    length+"px";
+
+  aimTrail.style.transform=
+    `rotate(${Math.atan2(weaponAimY,weaponAimX)}rad)`;
+
+  aimDot.style.display="block";
+
+  aimDot.style.left=
+    (playerX+weaponAimX*length)+"px";
+
+  aimDot.style.top=
+    (playerY+weaponAimY*length)+"px";
+
+}
+
+
+function stopMouseWeapon(){
+
+  if(!mouseWeaponActive)
+    return;
+
+  mouseWeaponActive=false;
+
+  if(
+    gameStarted &&
+    bossActive &&
+    !paused &&
+    !gameOverState
+  ){
+
+    shootInAimDirection();
+
+  }else{
+
+    resetWeaponJoystick();
+
+  }
+
+}
+
+
+/* MOUSE DO PC */
+
+document.addEventListener("mousedown",e=>{
+
+  /*
+    Apenas botão esquerdo.
+  */
+
+  if(e.button!==0)
+    return;
+
+  /*
+    Não interfere nos botões da interface.
+  */
+
+  if(
+    e.target.closest("button") ||
+    e.target.closest("#inventory") ||
+    e.target.closest(".screen")
+  )return;
+
+  if(
+    !gameStarted ||
+    gameOverState ||
+    paused
+  )return;
+
+
+  /*
+    CONTRA O BOSS:
+    segura o mouse para mirar.
+  */
+
+  if(bossActive){
+
+    e.preventDefault();
+
+    mouseWeaponActive=true;
+
+    mouseWeaponX=e.clientX;
+    mouseWeaponY=e.clientY;
+
+    updateMouseWeaponAim(
+      e.clientX,
+      e.clientY
+    );
+
+    return;
+
+  }
+
+
+  /*
+    FORA DO BOSS:
+    botão esquerdo = facada.
+  */
+
+  e.preventDefault();
+
+  startKnife();
+
+});
+
+
+document.addEventListener("mousemove",e=>{
+
+  if(
+    mouseWeaponActive &&
+    bossActive &&
+    !paused &&
+    !gameOverState
+  ){
+
+    mouseWeaponX=e.clientX;
+    mouseWeaponY=e.clientY;
+
+    updateMouseWeaponAim(
+      e.clientX,
+      e.clientY
+    );
+
+  }
+
+});
+
+
+document.addEventListener("mouseup",e=>{
+
+  if(e.button!==0)
+    return;
+
+  /*
+    Se estava mirando o boss,
+    soltar o botão dispara.
+  */
+
+  if(mouseWeaponActive){
+
+    e.preventDefault();
+
+    stopMouseWeapon();
+
+    return;
+
+  }
+
+  /*
+    Fora do boss, soltar o mouse
+    encerra a facada contínua.
+  */
+
+  stopKnife();
+
+});
+
+
+document.addEventListener("mouseleave",()=>{
+
+  if(mouseWeaponActive){
+
+    stopMouseWeapon();
+
+  }
+
+  stopKnife();
+
+});
+
+
+document.addEventListener("contextmenu",e=>{
+
+  e.preventDefault();
+
+});
+
+
+/* DISPARO */
 
 function shootInAimDirection(){
 
@@ -3045,6 +3982,8 @@ function shootInAimDirection(){
 
 }
 
+
+/* JOYSTICK DA ARMA MOBILE */
 
 weaponJoystickArea.onpointerdown=e=>{
 
@@ -3317,6 +4256,9 @@ function updateInventory(){
   batteryCount.textContent=
     radioBattery ? "✓":"0";
 
+  radioCount.textContent=
+    radioCollected ? "✓":"0";
+
   useFood.disabled=food<=0;
   useWater.disabled=water<=0;
   useMedicine.disabled=medicine<=0;
@@ -3484,7 +4426,10 @@ continueBossButton.onclick=()=>{
   bossAttackTimer=1400;
 
   bossProjectileTimer=
-    difficulty==="hard"
+    (
+      difficulty==="hard" ||
+      difficulty==="extreme"
+    )
     ?
     1800
     :
@@ -3492,12 +4437,33 @@ continueBossButton.onclick=()=>{
 
   bossProjectileHits=0;
 
-  showNotification(
-    difficulty==="hard"
+  bossRadialTimer=
+    difficulty==="extreme"
     ?
-    "Desvie dos projéteis! Mire e solte o joystick para atirar."
+    12000
     :
+    0;
+
+  showNotification(
+
+    difficulty==="extreme"
+
+    ?
+
+    "☠️ EXTREME: desvie dos projéteis e da rajada radial!"
+
+    :
+
+    difficulty==="hard"
+
+    ?
+
+    "Desvie dos projéteis! Segure o mouse para mirar e solte para atirar."
+
+    :
+
     "Mova o joystick da arma e solte para atirar!"
+
   );
 
 };
@@ -3602,13 +4568,16 @@ function executeBossAttack(){
 }
 
 
-/* PROJÉTEIS DO BOSS */
+/* PROJÉTIL NORMAL DO BOSS */
 
 function fireBossProjectile(){
 
   if(
     !bossActive ||
-    difficulty!=="hard" ||
+    (
+      difficulty!=="hard" &&
+      difficulty!=="extreme"
+    ) ||
     paused
   )return;
 
@@ -3641,7 +4610,8 @@ function fireBossProjectile(){
     ux:ux,
     uy:uy,
     speed:.48,
-    life:0
+    life:0,
+    radial:false
   };
 
   bossProjectiles.push(projectile);
@@ -3649,11 +4619,90 @@ function fireBossProjectile(){
 }
 
 
+/* ATAQUE RADIAL DO EXTREME */
+
+function fireBossRadial(){
+
+  if(
+    !bossActive ||
+    difficulty!=="extreme" ||
+    paused
+  )return;
+
+  const directions=[
+
+    [1,0],
+    [0.7071,0.7071],
+    [0,1],
+    [-0.7071,0.7071],
+    [-1,0],
+    [-0.7071,-0.7071],
+    [0,-1],
+    [0.7071,-0.7071]
+
+  ];
+
+  directions.forEach(dir=>{
+
+    const p=
+      document.createElement("div");
+
+    p.className="bossProjectile";
+
+    world.appendChild(p);
+
+    const projectile={
+
+      element:p,
+
+      x:bossX,
+
+      y:bossY,
+
+      ux:dir[0],
+
+      uy:dir[1],
+
+      speed:.48*1.10,
+
+      life:0,
+
+      radial:true
+
+    };
+
+    bossProjectiles.push(projectile);
+
+  });
+
+  bossWarning.style.display="block";
+
+  bossWarning.textContent=
+    "☠️ ATAQUE RADIAL! DESVIE DO ✳️!";
+
+  setTimeout(()=>{
+
+    if(
+      bossActive &&
+      !paused
+    )
+      bossWarning.style.display="none";
+
+  },900);
+
+}
+
+
+/* ATUALIZAR PROJÉTEIS */
+
 function updateBossProjectiles(delta){
 
   if(
     !bossActive ||
-    difficulty!=="hard" ||
+    (
+      difficulty!=="hard" &&
+      difficulty!=="extreme"
+    ) ||
     paused
   )return;
 
@@ -3778,11 +4827,22 @@ function updateBoss(delta){
     const dy=
       (playerY-bossY)/d;
 
+    const bossSpeed=
+      difficulty==="extreme"
+      ?
+      .025*1.25
+      :
+      .025;
+
     bossX+=
-      dx*.025*delta;
+      dx*
+      bossSpeed*
+      delta;
 
     bossY+=
-      dy*.025*delta;
+      dy*
+      bossSpeed*
+      delta;
 
   }
 
@@ -3815,7 +4875,8 @@ function updateBoss(delta){
 
 
   if(
-    difficulty==="hard"
+    difficulty==="hard" ||
+    difficulty==="extreme"
   ){
 
     bossProjectileTimer-=delta;
@@ -3829,6 +4890,25 @@ function updateBoss(delta){
       bossProjectileTimer=
         2100+
         Math.random()*1000;
+
+    }
+
+  }
+
+
+  if(
+    difficulty==="extreme"
+  ){
+
+    bossRadialTimer-=delta;
+
+    if(
+      bossRadialTimer<=0
+    ){
+
+      fireBossRadial();
+
+      bossRadialTimer=12000;
 
     }
 
@@ -3877,10 +4957,20 @@ function damageBoss(amount){
 }
 
 
+/* DERROTAR BOSS */
+
 function defeatBoss(){
+
+  if(bossDefeated)
+    return;
+
+  const deathX=bossX;
+  const deathY=bossY;
 
   bossActive=false;
   bossDefeated=true;
+
+  mouseWeaponActive=false;
 
   boss.style.display="none";
 
@@ -3901,16 +4991,61 @@ function defeatBoss(){
 
   bossProjectiles=[];
 
+  bossRadialTimer=0;
+
+  radioDropped=true;
+  radioCollected=false;
+
+  radio.style.left=
+    deathX+"px";
+
+  radio.style.top=
+    deathY+"px";
+
+  radio.style.display="block";
+
+  spawnPostBossZombies();
+
   objective=7;
 
   updateMission();
 
-  showNotification(
-    "🔥 Infectado Alfa derrotado! A Torre de Rádio está liberada!"
-  );
+  if(difficulty==="easy"){
+
+    showNotification(
+      "🔥 Alfa derrotado! 📻 O rádio caiu no chão. 2 infectados surgiram!"
+    );
+
+  }
+
+  else if(difficulty==="medium"){
+
+    showNotification(
+      "🔥 Alfa derrotado! 📻 O rádio caiu no chão. 3 infectados surgiram!"
+    );
+
+  }
+
+  else if(difficulty==="hard"){
+
+    showNotification(
+      "🔥 Alfa derrotado! 📻 O rádio caiu no chão. 5 infectados surgiram!"
+    );
+
+  }
+
+  else{
+
+    showNotification(
+      "☠️ Alfa derrotado! 📻 Pegue o rádio! 2 MUTANTES surgiram!"
+    );
+
+  }
 
 }
 
+
+/* VERIFICAR BOSS */
 
 function checkBossTrigger(){
 
@@ -3994,7 +5129,7 @@ function updateTimer(delta){
 }
 
 
-/* RESETAR PARTIDA SEM RECARREGAR A PÁGINA */
+/* RESETAR */
 
 function resetGameToStart(){
 
@@ -4003,6 +5138,13 @@ function resetGameToStart(){
   paused=false;
 
   stopKnife();
+
+  mouseWeaponActive=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
 
   joystickActive=false;
   weaponJoystickActive=false;
@@ -4047,6 +5189,10 @@ function resetGameToStart(){
   );
 
   zombies=[];
+
+  radioDropped=false;
+  radioCollected=false;
+  radio.style.display="none";
 
   document
     .querySelectorAll(".resource")
@@ -4100,6 +5246,7 @@ function resetGameToStart(){
   bossAttackTimer=0;
   bossProjectileTimer=0;
   bossProjectileHits=0;
+  bossRadialTimer=0;
 
   difficulty="hard";
 
@@ -4138,6 +5285,13 @@ function timeUp(){
 
   stopKnife();
 
+  mouseWeaponActive=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
+
   resetJoystick();
   resetWeaponJoystick();
 
@@ -4172,6 +5326,13 @@ function finishGame(){
 
   stopKnife();
 
+  mouseWeaponActive=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
+
   interactButton.style.display="none";
   weaponInfo.style.display="none";
   weaponJoystickArea.style.display="none";
@@ -4196,6 +5357,13 @@ function die(){
   paused=false;
 
   stopKnife();
+
+  mouseWeaponActive=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
 
   resetJoystick();
   resetWeaponJoystick();
@@ -4237,6 +5405,13 @@ function pauseGame(){
   paused=true;
 
   stopKnife();
+
+  mouseWeaponActive=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
 
   joystickActive=false;
   weaponJoystickActive=false;
@@ -4285,7 +5460,7 @@ resumeButton.onclick=()=>{
 };
 
 
-/* BOTÕES DE REINÍCIO */
+/* REINÍCIO */
 
 pauseRestartButton.onclick=e=>{
 
@@ -4370,7 +5545,14 @@ function startGame(diff){
 
   }
 
-  else{
+  else if(diff==="hard"){
+
+    TOTAL_TIME=120000;
+    MAX_WAVES=3;
+
+  }
+
+  else if(diff==="extreme"){
 
     TOTAL_TIME=120000;
     MAX_WAVES=3;
@@ -4382,6 +5564,13 @@ function startGame(diff){
   gameStarted=true;
   gameOverState=false;
   paused=false;
+
+  keys.w=false;
+  keys.a=false;
+  keys.s=false;
+  keys.d=false;
+
+  mouseWeaponActive=false;
 
   objective=0;
 
@@ -4407,12 +5596,17 @@ function startGame(diff){
   warehouseCode=false;
   radioBattery=false;
 
+  radioDropped=false;
+  radioCollected=false;
+  radio.style.display="none";
+
   bossActive=false;
   bossDefeated=false;
   bossHP=300;
 
   bossProjectileHits=0;
   bossProjectileTimer=0;
+  bossRadialTimer=0;
 
   bossProjectiles.forEach(
     p=>p.element.remove()
@@ -4556,6 +5750,9 @@ updatePlayer();
 updateBars();
 updateInventory();
 updateMission();
+
+radio.style.display="none";
+
 resetJoystick();
 resetWeaponJoystick();
 
